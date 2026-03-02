@@ -1,182 +1,121 @@
-const loginCard = document.querySelector('.login-card');
-const views = {
-  login: document.getElementById('loginView'),
-  register: document.getElementById('registerView'),
-  forgot: document.getElementById('forgotView'),
-  welcome: document.getElementById('welcomeView'),
-};
-
 const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const forgotForm = document.getElementById('forgotForm');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
 const rememberMeInput = document.getElementById('rememberMe');
-const welcomeMessage = document.getElementById('welcomeMessage');
-const logoutButton = document.getElementById('logoutButton');
+const togglePasswordButton = document.getElementById('togglePassword');
+const statusMessage = document.getElementById('statusMessage');
+const usernameError = document.getElementById('usernameError');
+const passwordError = document.getElementById('passwordError');
+const loginCard = document.querySelector('.login-card');
+const loginButton = document.getElementById('loginButton');
 
-const openButtons = document.querySelectorAll('[data-open]');
-const togglePasswordButtons = document.querySelectorAll('.toggle-password');
-
-const loadUsers = () => JSON.parse(localStorage.getItem('novacart.users') || '{}');
-const saveUsers = (users) => localStorage.setItem('novacart.users', JSON.stringify(users));
-
-const setStatus = (id, msg, type) => {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = `status ${type}`;
+const setStatus = (message, type) => {
+  statusMessage.textContent = message;
+  statusMessage.className = `status ${type}`;
 };
 
-const setError = (id, msg = '') => {
-  document.getElementById(id).textContent = msg;
+const clearErrors = () => {
+  usernameError.textContent = '';
+  passwordError.textContent = '';
 };
 
-const clearStatuses = () => ['loginStatus', 'registerStatus', 'forgotStatus'].forEach((id) => setStatus(id, '', ''));
-
-const showView = (name) => {
-  Object.values(views).forEach((view) => view.classList.add('hidden'));
-  views[name].classList.remove('hidden');
-};
-
-const runCardAnimation = () => {
+const triggerSubmitAnimation = () => {
   loginCard.classList.remove('is-submitting');
   void loginCard.offsetWidth;
   loginCard.classList.add('is-submitting');
   setTimeout(() => loginCard.classList.remove('is-submitting'), 500);
 };
 
-togglePasswordButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    const target = document.getElementById(button.dataset.target);
-    const isHidden = target.type === 'password';
-    target.type = isHidden ? 'text' : 'password';
-    button.textContent = isHidden ? 'Hide' : 'Show';
-  });
+const validate = () => {
+  clearErrors();
+  let isValid = true;
+
+  if (usernameInput.value.trim().length < 3) {
+    usernameError.textContent = 'Username must be at least 3 characters long.';
+    isValid = false;
+  }
+
+  if (passwordInput.value.length < 8) {
+    passwordError.textContent = 'Password must be at least 8 characters long.';
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+togglePasswordButton.addEventListener('click', () => {
+  const showPassword = passwordInput.type === 'password';
+  passwordInput.type = showPassword ? 'text' : 'password';
+  togglePasswordButton.textContent = showPassword ? 'Hide' : 'Show';
+  togglePasswordButton.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
 });
 
-openButtons.forEach((button) => {
-  button.addEventListener('click', () => {
-    clearStatuses();
-    showView(button.dataset.open);
-  });
+loginButton.addEventListener('pointerdown', (event) => {
+  const rect = loginButton.getBoundingClientRect();
+  loginButton.style.setProperty('--rx', `${event.clientX - rect.left}px`);
+  loginButton.style.setProperty('--ry', `${event.clientY - rect.top}px`);
+  loginButton.classList.remove('ripple');
+  void loginButton.offsetWidth;
+  loginButton.classList.add('ripple');
+  setTimeout(() => loginButton.classList.remove('ripple'), 330);
+});
+
+loginCard.addEventListener('pointermove', (event) => {
+  const rect = loginCard.getBoundingClientRect();
+  const px = (event.clientX - rect.left) / rect.width;
+  const py = (event.clientY - rect.top) / rect.height;
+
+  const rotateY = (px - 0.5) * 8;
+  const rotateX = (0.5 - py) * 8;
+
+  loginCard.style.transform = `translateY(0) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  loginCard.style.boxShadow = `${-rotateY * 1.5}px ${rotateX * 1.5 + 16}px 30px rgba(15, 23, 51, 0.55)`;
+  loginCard.style.setProperty('--mx', `${px * 100}%`);
+  loginCard.style.setProperty('--my', `${py * 100}%`);
+});
+
+loginCard.addEventListener('pointerleave', () => {
+  loginCard.style.transform = 'translateY(0) rotateX(0deg) rotateY(0deg)';
+  loginCard.style.boxShadow = '0 10px 25px rgba(12, 21, 44, 0.3)';
+  loginCard.style.setProperty('--mx', '50%');
+  loginCard.style.setProperty('--my', '50%');
 });
 
 loginForm.addEventListener('submit', (event) => {
   event.preventDefault();
-  clearStatuses();
-  setError('loginUsernameError');
-  setError('loginPasswordError');
 
-  const username = document.getElementById('loginUsername').value.trim();
-  const password = document.getElementById('loginPassword').value;
-
-  if (username.length < 3) {
-    setError('loginUsernameError', 'Username must be at least 3 characters long.');
-    setStatus('loginStatus', 'Please fix highlighted fields.', 'error');
-    runCardAnimation();
+  if (!validate()) {
+    setStatus('Please correct the highlighted fields.', 'error');
+    triggerSubmitAnimation();
     return;
   }
 
-  const users = loadUsers();
-  if (!users[username] || users[username].password !== password) {
-    setError('loginPasswordError', 'Invalid username or password.');
-    setStatus('loginStatus', 'Login failed. Try again or reset password.', 'error');
-    runCardAnimation();
-    return;
-  }
+  const userSession = {
+    username: usernameInput.value.trim(),
+    rememberMe: rememberMeInput.checked,
+    loginAt: new Date().toISOString(),
+  };
 
-  const session = { username, rememberMe: rememberMeInput.checked, loginAt: new Date().toISOString() };
-  localStorage.setItem('novacart.session', JSON.stringify(session));
-  welcomeMessage.textContent = `Hi ${username}, your account is ready. Continue shopping now.`;
-  showView('welcome');
-  runCardAnimation();
-});
-
-registerForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  clearStatuses();
-  setError('registerUsernameError');
-  setError('registerPasswordError');
-
-  const username = document.getElementById('registerUsername').value.trim();
-  const password = document.getElementById('registerPassword').value;
-
-  if (username.length < 3) {
-    setError('registerUsernameError', 'Use at least 3 characters.');
-    setStatus('registerStatus', 'Username is too short.', 'error');
-    runCardAnimation();
-    return;
-  }
-  if (password.length < 8) {
-    setError('registerPasswordError', 'Password must be at least 8 characters long.');
-    setStatus('registerStatus', 'Password is too short.', 'error');
-    runCardAnimation();
-    return;
-  }
-
-  const users = loadUsers();
-  if (users[username]) {
-    setError('registerUsernameError', 'This username already exists.');
-    setStatus('registerStatus', 'Choose another username.', 'error');
-    runCardAnimation();
-    return;
-  }
-
-  users[username] = { password, createdAt: new Date().toISOString() };
-  saveUsers(users);
-  localStorage.setItem('novacart.session', JSON.stringify({ username, rememberMe: true, loginAt: new Date().toISOString() }));
-  welcomeMessage.textContent = `Account created for ${username}. Welcome to NovaCart!`;
-  showView('welcome');
-  runCardAnimation();
-});
-
-forgotForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  clearStatuses();
-  setError('forgotUsernameError');
-  setError('forgotPasswordError');
-
-  const username = document.getElementById('forgotUsername').value.trim();
-  const newPassword = document.getElementById('forgotPassword').value;
-
-  if (!username) {
-    setError('forgotUsernameError', 'Username is required.');
-    setStatus('forgotStatus', 'Please enter username.', 'error');
-    runCardAnimation();
-    return;
-  }
-  if (newPassword.length < 8) {
-    setError('forgotPasswordError', 'Password must be at least 8 characters long.');
-    setStatus('forgotStatus', 'Please enter a stronger password.', 'error');
-    runCardAnimation();
-    return;
-  }
-
-  const users = loadUsers();
-  if (!users[username]) {
-    setError('forgotUsernameError', 'No account found for this username.');
-    setStatus('forgotStatus', 'Register first if you are a new user.', 'error');
-    runCardAnimation();
-    return;
-  }
-
-  users[username].password = newPassword;
-  users[username].updatedAt = new Date().toISOString();
-  saveUsers(users);
-  setStatus('forgotStatus', 'Password updated. You can now sign in.', 'success');
-  runCardAnimation();
-  setTimeout(() => showView('login'), 700);
-});
-
-logoutButton.addEventListener('click', () => {
-  localStorage.removeItem('novacart.session');
-  showView('login');
+  localStorage.setItem('novacart.session', JSON.stringify(userSession));
+  setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
+  triggerSubmitAnimation();
+  loginForm.reset();
+  passwordInput.type = 'password';
+  togglePasswordButton.textContent = 'Show';
 });
 
 window.addEventListener('DOMContentLoaded', () => {
-  const session = JSON.parse(localStorage.getItem('novacart.session') || 'null');
-  if (session?.rememberMe && session?.username) {
-    welcomeMessage.textContent = `Welcome back, ${session.username}. Continue shopping.`;
-    showView('welcome');
+  const previousSession = localStorage.getItem('novacart.session');
+
+  if (!previousSession) {
     return;
   }
-  showView('login');
+
+  const { username, rememberMe } = JSON.parse(previousSession);
+
+  if (rememberMe && username) {
+    usernameInput.value = username;
+    rememberMeInput.checked = true;
+    setStatus(`Welcome back, ${username}. Continue where you left off.`, 'success');
+  }
 });
