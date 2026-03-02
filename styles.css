@@ -30,6 +30,7 @@ body {
   inset: 0;
   pointer-events: none;
   background: linear-gradient(130deg, rgba(255, 255, 255, 0.08), transparent 35%, rgba(255, 255, 255, 0.03));
+  animation: pulseGlow 8s ease-in-out infinite alternate;
 }
 
 .orb {
@@ -46,6 +47,7 @@ body {
   left: 8%;
   top: 12%;
   background: radial-gradient(circle, rgba(109, 141, 255, 0.95), rgba(109, 141, 255, 0));
+  animation: floatY 9s ease-in-out infinite;
 }
 
 .orb-2 {
@@ -54,6 +56,7 @@ body {
   right: 10%;
   top: 8%;
   background: radial-gradient(circle, rgba(13, 200, 206, 0.95), rgba(13, 200, 206, 0));
+  animation: floatY 10s ease-in-out infinite reverse;
 }
 
 .orb-3 {
@@ -62,6 +65,7 @@ body {
   right: 30%;
   bottom: 2%;
   background: radial-gradient(circle, rgba(153, 126, 255, 0.85), rgba(153, 126, 255, 0));
+  animation: floatX 11s ease-in-out infinite;
 }
 
 .layout {
@@ -79,10 +83,13 @@ body {
   border-radius: 24px;
   backdrop-filter: blur(12px);
   background: var(--card);
+  opacity: 0;
 }
 
 .brand-panel {
   padding: 44px;
+  transform: translateY(20px);
+  animation: slideInUp 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 .badge {
@@ -102,7 +109,8 @@ body {
   background-size: 220% auto;
   -webkit-background-clip: text;
   background-clip: text;
-  color: #e8eeff;
+  color: transparent;
+  animation: shimmerText 5s linear infinite;
 }
 
 .subtitle {
@@ -125,12 +133,17 @@ body {
   background: rgba(133, 150, 229, 0.12);
   border: 1px solid rgba(151, 173, 255, 0.2);
   font-weight: 500;
+  transform: translateX(-12px);
+  opacity: 0;
+  animation: itemReveal 500ms ease forwards;
 }
 
+.feature-list li:nth-child(1) { animation-delay: 220ms; }
+.feature-list li:nth-child(2) { animation-delay: 320ms; }
+.feature-list li:nth-child(3) { animation-delay: 420ms; }
 
 .login-card {
   padding: 34px;
-  opacity: 0;
   transform: translateY(20px);
   transform-style: preserve-3d;
   transition: transform 220ms ease, box-shadow 220ms ease;
@@ -353,6 +366,16 @@ input[type='checkbox'] { accent-color: var(--accent); }
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes itemReveal {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes shimmerText {
+  from { background-position: 0% center; }
+  to { background-position: 220% center; }
+}
+
 @keyframes shakeX {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-3px); }
@@ -368,6 +391,21 @@ input[type='checkbox'] { accent-color: var(--accent); }
 @keyframes submitPulse {
   0% { box-shadow: 0 0 0 0 rgba(109, 141, 255, 0.3); }
   100% { box-shadow: 0 0 0 16px rgba(109, 141, 255, 0); }
+}
+
+@keyframes pulseGlow {
+  from { opacity: 0.35; }
+  to { opacity: 0.6; }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-24px); }
+}
+
+@keyframes floatX {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
 }
 
 @media (max-width: 900px) {
