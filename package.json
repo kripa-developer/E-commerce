@@ -1,0 +1,19 @@
+{
+  "name": "e-commerce",
+  "version": "1.0.0",
+  "description": "NovaCart phase-1 login UI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --check app.js"
+  },
+  "keywords": [
+    "ecommerce",
+    "login-ui",
+    "frontend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
