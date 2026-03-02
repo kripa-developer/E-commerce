@@ -16,9 +16,5 @@ npm start
 ```
 Then open `http://localhost:4173`.
 
-## If you want Angular + TypeScript next
-Once you are ready, we can migrate this UI into Angular components (`LoginComponent`) and TypeScript forms (`ReactiveFormsModule`) while keeping the same design/animations.
 
----
-
-When you're ready, share the next feature and I can build it step by step (catalog, navbar, product cards, cart, checkout, etc.).
+share the next feature and can build it step by step (catalog, navbar, product cards, cart, checkout, etc.).
