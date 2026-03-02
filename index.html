@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Commerce | Auth</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true">
+      <span class="orb orb-1"></span>
+      <span class="orb orb-2"></span>
+      <span class="orb orb-3"></span>
+    </div>
+
+    <main class="layout">
+      <section class="brand-panel">
+        <p class="badge">New Season 2026</p>
+        <h1 class="animated-title">Welcome to NovaCart</h1>
+        <p class="subtitle">A modern e-commerce experience with personalized recommendations, secure checkout, and lightning-fast performance.</p>
+        <ul class="feature-list">
+          <li>AI-driven product discovery</li>
+          <li>One-tap secure payments</li>
+          <li>Real-time order tracking</li>
+        </ul>
+      </section>
+
+      <section class="login-card" aria-live="polite">
+        <div class="auth-view" id="loginView">
+          <h2>Sign in</h2>
+          <p class="card-subtitle">Access your account to continue shopping.</p>
+          <form id="loginForm" novalidate>
+            <div class="field-group">
+              <label for="loginUsername">Username</label>
+              <input id="loginUsername" type="text" autocomplete="username" placeholder="Enter your username" required minlength="3" />
+              <small class="error" id="loginUsernameError"></small>
+            </div>
+            <div class="field-group">
+              <label for="loginPassword">Password</label>
+              <div class="password-wrap">
+                <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8" />
+                <button type="button" class="toggle-password" data-target="loginPassword">Show</button>
+              </div>
+              <small class="error" id="loginPasswordError"></small>
+            </div>
+            <div class="form-tools">
+              <label class="checkbox-row"><input id="rememberMe" type="checkbox" /> <span>Remember me</span></label>
+              <button type="button" class="link-btn link-inline" data-open="forgot">Forgot password?</button>
+            </div>
+            <button type="submit" class="primary-btn" id="loginButton">Sign in securely</button>
+            <p class="status" id="loginStatus"></p>
+          </form>
+          <p class="signup-text">Don't have an account? <button type="button" class="link-btn link-inline" data-open="register">Create one</button></p>
+        </div>
+
+        <div class="auth-view hidden" id="registerView">
+          <h2>Create account</h2>
+          <p class="card-subtitle">Register a new username to continue.</p>
+          <form id="registerForm" novalidate>
+            <div class="field-group">
+              <label for="registerUsername">New username</label>
+              <input id="registerUsername" type="text" autocomplete="username" placeholder="Choose a username" required minlength="3" />
+              <small class="error" id="registerUsernameError"></small>
+            </div>
+            <div class="field-group">
+              <label for="registerPassword">Password</label>
+              <div class="password-wrap">
+                <input id="registerPassword" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" required minlength="8" />
+                <button type="button" class="toggle-password" data-target="registerPassword">Show</button>
+              </div>
+              <small class="error" id="registerPasswordError"></small>
+            </div>
+            <button type="submit" class="primary-btn">Register & Continue</button>
+            <p class="status" id="registerStatus"></p>
+          </form>
+          <p class="signup-text">Already have an account? <button type="button" class="link-btn link-inline" data-open="login">Sign in</button></p>
+        </div>
+
+        <div class="auth-view hidden" id="forgotView">
+          <h2>Reset password</h2>
+          <p class="card-subtitle">Enter username and set a new password.</p>
+          <form id="forgotForm" novalidate>
+            <div class="field-group">
+              <label for="forgotUsername">Username</label>
+              <input id="forgotUsername" type="text" placeholder="Your registered username" required />
+              <small class="error" id="forgotUsernameError"></small>
+            </div>
+            <div class="field-group">
+              <label for="forgotPassword">New password</label>
+              <div class="password-wrap">
+                <input id="forgotPassword" type="password" autocomplete="new-password" placeholder="Minimum 8 characters" required minlength="8" />
+                <button type="button" class="toggle-password" data-target="forgotPassword">Show</button>
+              </div>
+              <small class="error" id="forgotPasswordError"></small>
+            </div>
+            <button type="submit" class="primary-btn">Update password</button>
+            <p class="status" id="forgotStatus"></p>
+          </form>
+          <p class="signup-text"><button type="button" class="link-btn link-inline" data-open="login">Back to sign in</button></p>
+        </div>
+
+        <div class="auth-view hidden" id="welcomeView">
+          <h2>Welcome 🎉</h2>
+          <p class="card-subtitle" id="welcomeMessage"></p>
+          <button type="button" class="primary-btn" id="logoutButton">Log out</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
