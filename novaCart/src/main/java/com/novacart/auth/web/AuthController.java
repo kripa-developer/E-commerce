@@ -3,6 +3,7 @@ package com.novacart.auth.web;
 import com.novacart.auth.dto.AuthResponse;
 import com.novacart.auth.dto.LoginRequest;
 import com.novacart.auth.dto.RefreshTokenRequest;
+import com.novacart.auth.dto.RegisterRequest;
 import com.novacart.auth.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/refresh")
