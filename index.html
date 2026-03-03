@@ -50,6 +50,18 @@
             <small class="error" id="passwordError"></small>
           </div>
 
+          <div class="field-group hidden" id="confirmPasswordGroup">
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your password" minlength="8" />
+            <small class="error" id="confirmPasswordError"></small>
+          </div>
+
+          <div class="field-group hidden" id="recoveryGroup">
+            <label for="recoveryEmail">Recovery Email</label>
+            <input id="recoveryEmail" name="recoveryEmail" type="email" autocomplete="email" placeholder="Enter your account email" />
+            <small class="error" id="recoveryEmailError"></small>
+          </div>
+
           <div class="form-tools">
             <label class="checkbox-row" for="rememberMe">
               <input id="rememberMe" name="rememberMe" type="checkbox" />
