@@ -1,0 +1,69 @@
+<section class="login-card" aria-labelledby="login-title">
+  <h2 id="login-title">{{ authMode === 'create' ? 'Create account' : 'Sign in' }}</h2>
+  <p class="card-subtitle">
+    {{ authMode === 'create' ? 'Set up your NovaCart account in seconds.' : 'Access your account to continue shopping.' }}
+  </p>
+
+  <form (ngSubmit)="onSubmit()" novalidate>
+    <div class="field-group">
+      <label for="username">Username</label>
+      <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username" [(ngModel)]="username" />
+      <small class="error">{{ usernameError }}</small>
+    </div>
+
+    <div class="field-group">
+      <label for="password">Password</label>
+      <div class="password-wrap">
+        <input
+          id="password"
+          name="password"
+          [type]="showPassword ? 'text' : 'password'"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          [(ngModel)]="password"
+        />
+        <button type="button" id="togglePassword" (click)="onTogglePassword()">{{ showPassword ? 'Hide' : 'Show' }}</button>
+      </div>
+      <small class="error">{{ passwordError }}</small>
+    </div>
+
+    <div class="field-group" *ngIf="authMode === 'create'">
+      <label for="confirmPassword">Confirm Password</label>
+      <input
+        id="confirmPassword"
+        name="confirmPassword"
+        [type]="showPassword ? 'text' : 'password'"
+        autocomplete="new-password"
+        placeholder="Confirm your password"
+        [(ngModel)]="confirmPassword"
+      />
+      <small class="error">{{ confirmPasswordError }}</small>
+    </div>
+
+    <div class="form-tools">
+      <label class="checkbox-row" for="rememberMe">
+        <input id="rememberMe" name="rememberMe" type="checkbox" [(ngModel)]="rememberMe" />
+        <span>Remember me</span>
+      </label>
+      <a routerLink="/forgot-password" class="link-btn">Forgot password?</a>
+    </div>
+
+    <button type="submit" class="primary-btn">{{ authMode === 'create' ? 'Create account' : 'Sign in securely' }}</button>
+    <p class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">{{ statusMessage }}</p>
+  </form>
+
+  <div class="divider"><span>or continue with</span></div>
+  <div class="social-actions">
+    <button type="button" class="social-btn">Google</button>
+    <button type="button" class="social-btn">Apple</button>
+    <button type="button" class="social-btn">GitHub</button>
+  </div>
+
+  <p class="signup-text" *ngIf="authMode === 'signin'">
+    Don't have an account? <a href="#" class="link-btn" (click)="$event.preventDefault(); setMode('create')">Create one</a>
+  </p>
+
+  <p class="signup-text" *ngIf="authMode === 'create'">
+    Already have an account? <a href="#" class="link-btn" (click)="$event.preventDefault(); setMode('signin')">Sign in</a>
+  </p>
+</section>
