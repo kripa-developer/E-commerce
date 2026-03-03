@@ -298,6 +298,51 @@ input[type='checkbox'] { accent-color: var(--accent); }
   filter: brightness(1.08);
 }
 
+.primary-btn:disabled,
+.primary-btn.is-loading {
+  cursor: not-allowed;
+  opacity: 0.78;
+  filter: grayscale(0.1);
+}
+
+.primary-btn.is-loading::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+.strength-wrap {
+  margin-top: 10px;
+}
+
+.strength-track {
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  transition: width 220ms ease, background-color 220ms ease;
+}
+
+.strength-label {
+  margin-top: 6px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
 .status {
   min-height: 22px;
   margin: 12px 0 0;
@@ -397,6 +442,10 @@ input[type='checkbox'] { accent-color: var(--accent); }
 @keyframes popIn {
   0% { transform: scale(0.96); opacity: 0.3; }
   100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 @keyframes submitPulse {

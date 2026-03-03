@@ -31,6 +31,10 @@
           <div class="field-group">
             <label for="newPassword">Password</label>
             <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" placeholder="Create a password" required minlength="8" />
+            <div class="strength-wrap" aria-live="polite">
+              <div class="strength-track"><div class="strength-fill" id="strengthFill"></div></div>
+              <div class="strength-label" id="strengthLabel">Strength: Too short</div>
+            </div>
             <small class="error" id="newPasswordError"></small>
           </div>
 
@@ -40,7 +44,7 @@
             <small class="error" id="confirmPasswordError"></small>
           </div>
 
-          <button type="submit" class="primary-btn">Create account</button>
+          <button type="submit" class="primary-btn" id="createButton">Create account</button>
           <p class="status" id="createStatus" role="status" aria-live="polite"></p>
         </form>
 
@@ -57,6 +61,33 @@
       const newPasswordError = document.getElementById('newPasswordError');
       const confirmPasswordError = document.getElementById('confirmPasswordError');
       const createStatus = document.getElementById('createStatus');
+      const createButton = document.getElementById('createButton');
+      const strengthFill = document.getElementById('strengthFill');
+      const strengthLabel = document.getElementById('strengthLabel');
+
+      const strengthMeta = [
+        { label: 'Too short', color: 'rgba(255,255,255,0.15)', width: 0 },
+        { label: 'Weak', color: '#ff7b90', width: 33 },
+        { label: 'Medium', color: '#ffd166', width: 66 },
+        { label: 'Strong', color: '#58e6a9', width: 100 },
+      ];
+
+      const getStrength = (value) => {
+        if (value.length < 8) return 0;
+        let score = 1;
+        if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score += 1;
+        if (/\d/.test(value) && /[^\w\s]/.test(value)) score += 1;
+        return Math.min(score, 3);
+      };
+
+      const updateStrength = () => {
+        const strength = strengthMeta[getStrength(newPassword.value)];
+        strengthFill.style.width = `${strength.width}%`;
+        strengthFill.style.backgroundColor = strength.color;
+        strengthLabel.textContent = `Strength: ${strength.label}`;
+      };
+
+      newPassword.addEventListener('input', updateStrength);
 
       createForm.addEventListener('submit', (event) => {
         event.preventDefault();
@@ -89,15 +120,33 @@
           return;
         }
 
-        localStorage.setItem('novacart.account', JSON.stringify({
-          username: newUsername.value.trim(),
-          createdAt: new Date().toISOString(),
-        }));
+        const originalButtonText = createButton.textContent;
+        createButton.disabled = true;
+        createButton.classList.add('is-loading');
+        createButton.textContent = 'Creating account...';
 
-        createStatus.textContent = 'Account created successfully. You can sign in now.';
-        createStatus.classList.add('success');
-        createForm.reset();
+        setTimeout(() => {
+          localStorage.setItem('novacart.account', JSON.stringify({
+            username: newUsername.value.trim(),
+            createdAt: new Date().toISOString(),
+          }));
+
+          createStatus.textContent = 'Account created successfully. Redirecting to sign in...';
+          createStatus.classList.add('success');
+          createForm.reset();
+          updateStrength();
+
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 900);
+
+          createButton.disabled = false;
+          createButton.classList.remove('is-loading');
+          createButton.textContent = originalButtonText;
+        }, 700);
       });
+
+      updateStrength();
     </script>
   </body>
 </html>

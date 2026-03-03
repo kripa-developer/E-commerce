@@ -181,25 +181,10 @@ loginForm.addEventListener('submit', (event) => {
     return;
   }
 
-  const username = usernameInput.value.trim();
-
-  if (authMode === 'create') {
-    localStorage.setItem(
-      'novacart.account',
-      JSON.stringify({ username, createdAt: new Date().toISOString() })
-    );
-    setStatus(`Account created for ${username}. You can sign in now.`, 'success');
-    triggerSubmitAnimation();
-    setTimeout(() => setMode('signin'), 700);
-    return;
-  }
-
-  if (authMode === 'forgot') {
-    setStatus(`Reset link sent to ${recoveryEmailInput.value.trim()}. Check your inbox.`, 'success');
-    triggerSubmitAnimation();
-    setTimeout(() => setMode('signin'), 900);
-    return;
-  }
+  const originalButtonText = loginButton.textContent;
+  loginButton.disabled = true;
+  loginButton.classList.add('is-loading');
+  loginButton.textContent = 'Signing in...';
 
   const userSession = {
     username,
@@ -207,12 +192,17 @@ loginForm.addEventListener('submit', (event) => {
     loginAt: new Date().toISOString(),
   };
 
-  localStorage.setItem('novacart.session', JSON.stringify(userSession));
-  setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
-  triggerSubmitAnimation();
-  loginForm.reset();
-  passwordInput.type = 'password';
-  togglePasswordButton.textContent = 'Show';
+  setTimeout(() => {
+    localStorage.setItem('novacart.session', JSON.stringify(userSession));
+    setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
+    triggerSubmitAnimation();
+    loginForm.reset();
+    passwordInput.type = 'password';
+    togglePasswordButton.textContent = 'Show';
+    loginButton.disabled = false;
+    loginButton.classList.remove('is-loading');
+    loginButton.textContent = originalButtonText;
+  }, 600);
 });
 
 forgotPasswordLink.addEventListener('click', (event) => {
