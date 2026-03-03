@@ -1,8 +1,10 @@
+server:
+  port: 8811
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/novacart_dev?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: novacart
-    password: novacart
+    url: jdbc:mysql://localhost:3306/novacart_dev
+    username: root
+    password: Kripa@123
 
   jpa:
     hibernate:
