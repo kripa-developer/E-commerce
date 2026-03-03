@@ -20,6 +20,19 @@ const recoveryGroup = document.getElementById('recoveryGroup');
 
 let authMode = 'signin';
 
+
+const toSafeUsername = (value) => {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (value && typeof value === 'object' && typeof value.value === 'string') {
+    return value.value.trim();
+  }
+
+  return '';
+};
+
 const setStatus = (message, type) => {
   statusMessage.textContent = message;
   statusMessage.className = `status ${type}`;
@@ -104,7 +117,7 @@ const validate = () => {
   clearErrors();
   let isValid = true;
 
-  if (usernameInput.value.trim().length < 3) {
+  if (toSafeUsername(usernameInput.value).length < 3) {
     usernameError.textContent = 'Username must be at least 3 characters long.';
     isValid = false;
   }
@@ -186,6 +199,8 @@ loginForm.addEventListener('submit', (event) => {
   loginButton.classList.add('is-loading');
   loginButton.textContent = 'Signing in...';
 
+  const username = toSafeUsername(usernameInput.value);
+
   const userSession = {
     username,
     rememberMe: rememberMeInput.checked,
@@ -205,16 +220,6 @@ loginForm.addEventListener('submit', (event) => {
   }, 600);
 });
 
-forgotPasswordLink.addEventListener('click', (event) => {
-  event.preventDefault();
-  setMode('forgot');
-});
-
-createAccountLink.addEventListener('click', (event) => {
-  event.preventDefault();
-  setMode('create');
-});
-
 window.addEventListener('DOMContentLoaded', () => {
   const previousSession = localStorage.getItem('novacart.session');
 
@@ -222,11 +227,16 @@ window.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const { username, rememberMe } = JSON.parse(previousSession);
+  try {
+    const { username, rememberMe } = JSON.parse(previousSession);
+    const safeUsername = toSafeUsername(username);
 
-  if (rememberMe && username) {
-    usernameInput.value = username;
-    rememberMeInput.checked = true;
-    setStatus(`Welcome back, ${username}. Continue where you left off.`, 'success');
+    if (rememberMe && safeUsername) {
+      usernameInput.value = safeUsername;
+      rememberMeInput.checked = true;
+      setStatus(`Welcome back, ${safeUsername}. Continue where you left off.`, 'success');
+    }
+  } catch (error) {
+    localStorage.removeItem('novacart.session');
   }
 });
