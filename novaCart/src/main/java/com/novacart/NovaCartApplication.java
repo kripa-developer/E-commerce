@@ -3,7 +3,7 @@ package com.novacart;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.novacart")
 public class NovaCartApplication {
 
     public static void main(String[] args) {
