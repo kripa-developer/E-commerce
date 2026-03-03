@@ -90,18 +90,28 @@ loginForm.addEventListener('submit', (event) => {
     return;
   }
 
+  const originalButtonText = loginButton.textContent;
+  loginButton.disabled = true;
+  loginButton.classList.add('is-loading');
+  loginButton.textContent = 'Signing in...';
+
   const userSession = {
     username: usernameInput.value.trim(),
     rememberMe: rememberMeInput.checked,
     loginAt: new Date().toISOString(),
   };
 
-  localStorage.setItem('novacart.session', JSON.stringify(userSession));
-  setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
-  triggerSubmitAnimation();
-  loginForm.reset();
-  passwordInput.type = 'password';
-  togglePasswordButton.textContent = 'Show';
+  setTimeout(() => {
+    localStorage.setItem('novacart.session', JSON.stringify(userSession));
+    setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
+    triggerSubmitAnimation();
+    loginForm.reset();
+    passwordInput.type = 'password';
+    togglePasswordButton.textContent = 'Show';
+    loginButton.disabled = false;
+    loginButton.classList.remove('is-loading');
+    loginButton.textContent = originalButtonText;
+  }, 600);
 });
 
 window.addEventListener('DOMContentLoaded', () => {
