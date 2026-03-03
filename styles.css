@@ -177,10 +177,12 @@ label {
 
 input[type='text'],
 input[type='password'],
+input[type='email'],
 .password-wrap button { font: inherit; }
 
 input[type='text'],
-input[type='password'] {
+input[type='password'],
+input[type='email'] {
   width: 100%;
   border: 1px solid rgba(162, 180, 248, 0.35);
   background: rgba(13, 20, 42, 0.88);
@@ -217,6 +219,10 @@ input:focus {
   background: rgba(109, 141, 255, 0.3);
 }
 
+
+.hidden {
+  display: none;
+}
 .form-tools {
   display: flex;
   justify-content: space-between;
