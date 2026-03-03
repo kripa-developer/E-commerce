@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NovaCart | Create Account</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true">
+      <span class="orb orb-1"></span>
+      <span class="orb orb-2"></span>
+      <span class="orb orb-3"></span>
+    </div>
+
+    <main class="layout single-panel">
+      <section class="login-card" aria-labelledby="create-title">
+        <h2 id="create-title">Create account</h2>
+        <p class="card-subtitle">Join NovaCart and start shopping smarter.</p>
+
+        <form id="createForm" novalidate>
+          <div class="field-group">
+            <label for="newUsername">Username</label>
+            <input id="newUsername" name="newUsername" type="text" autocomplete="username" placeholder="Choose a username" required minlength="3" />
+            <small class="error" id="newUsernameError"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="newPassword">Password</label>
+            <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" placeholder="Create a password" required minlength="8" />
+            <small class="error" id="newPasswordError"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm password" required minlength="8" />
+            <small class="error" id="confirmPasswordError"></small>
+          </div>
+
+          <button type="submit" class="primary-btn">Create account</button>
+          <p class="status" id="createStatus" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="signup-text">Already registered? <a href="index.html" class="link-btn">Sign in</a></p>
+      </section>
+    </main>
+
+    <script>
+      const createForm = document.getElementById('createForm');
+      const newUsername = document.getElementById('newUsername');
+      const newPassword = document.getElementById('newPassword');
+      const confirmPassword = document.getElementById('confirmPassword');
+      const newUsernameError = document.getElementById('newUsernameError');
+      const newPasswordError = document.getElementById('newPasswordError');
+      const confirmPasswordError = document.getElementById('confirmPasswordError');
+      const createStatus = document.getElementById('createStatus');
+
+      createForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        newUsernameError.textContent = '';
+        newPasswordError.textContent = '';
+        confirmPasswordError.textContent = '';
+        createStatus.textContent = '';
+        createStatus.className = 'status';
+
+        let valid = true;
+
+        if (newUsername.value.trim().length < 3) {
+          newUsernameError.textContent = 'Username must be at least 3 characters.';
+          valid = false;
+        }
+
+        if (newPassword.value.length < 8) {
+          newPasswordError.textContent = 'Password must be at least 8 characters.';
+          valid = false;
+        }
+
+        if (confirmPassword.value !== newPassword.value) {
+          confirmPasswordError.textContent = 'Passwords do not match.';
+          valid = false;
+        }
+
+        if (!valid) {
+          createStatus.textContent = 'Please fix the highlighted fields.';
+          createStatus.classList.add('error');
+          return;
+        }
+
+        localStorage.setItem('novacart.account', JSON.stringify({
+          username: newUsername.value.trim(),
+          createdAt: new Date().toISOString(),
+        }));
+
+        createStatus.textContent = 'Account created successfully. You can sign in now.';
+        createStatus.classList.add('success');
+        createForm.reset();
+      });
+    </script>
+  </body>
+</html>

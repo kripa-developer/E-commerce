@@ -77,6 +77,11 @@ body {
   perspective: 1200px;
 }
 
+.layout.single-panel {
+  grid-template-columns: minmax(320px, 460px);
+  justify-content: center;
+}
+
 .brand-panel,
 .login-card {
   border: 1px solid var(--card-border);
@@ -177,10 +182,12 @@ label {
 
 input[type='text'],
 input[type='password'],
+input[type='email'],
 .password-wrap button { font: inherit; }
 
 input[type='text'],
-input[type='password'] {
+input[type='password'],
+input[type='email'] {
   width: 100%;
   border: 1px solid rgba(162, 180, 248, 0.35);
   background: rgba(13, 20, 42, 0.88);
