@@ -1,13 +1,24 @@
 const loginForm = document.getElementById('loginForm');
 const usernameInput = document.getElementById('username');
 const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const recoveryEmailInput = document.getElementById('recoveryEmail');
 const rememberMeInput = document.getElementById('rememberMe');
 const togglePasswordButton = document.getElementById('togglePassword');
 const statusMessage = document.getElementById('statusMessage');
 const usernameError = document.getElementById('usernameError');
 const passwordError = document.getElementById('passwordError');
+const confirmPasswordError = document.getElementById('confirmPasswordError');
+const recoveryEmailError = document.getElementById('recoveryEmailError');
 const loginCard = document.querySelector('.login-card');
 const loginButton = document.getElementById('loginButton');
+const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+const createAccountLink = document.getElementById('createAccountLink');
+const signupRow = document.getElementById('signupRow');
+const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+const recoveryGroup = document.getElementById('recoveryGroup');
+
+let authMode = 'signin';
 
 const setStatus = (message, type) => {
   statusMessage.textContent = message;
@@ -17,6 +28,8 @@ const setStatus = (message, type) => {
 const clearErrors = () => {
   usernameError.textContent = '';
   passwordError.textContent = '';
+  confirmPasswordError.textContent = '';
+  recoveryEmailError.textContent = '';
 };
 
 const triggerSubmitAnimation = () => {
@@ -24,6 +37,67 @@ const triggerSubmitAnimation = () => {
   void loginCard.offsetWidth;
   loginCard.classList.add('is-submitting');
   setTimeout(() => loginCard.classList.remove('is-submitting'), 500);
+};
+
+const resetFormModeState = () => {
+  clearErrors();
+  loginForm.reset();
+  passwordInput.type = 'password';
+  confirmPasswordInput.type = 'password';
+  togglePasswordButton.textContent = 'Show';
+  togglePasswordButton.setAttribute('aria-label', 'Show password');
+};
+
+const setMode = (mode) => {
+  authMode = mode;
+  loginForm.dataset.mode = mode;
+
+  const title = document.getElementById('login-title');
+  const subtitle = document.querySelector('.card-subtitle');
+
+  if (mode === 'create') {
+    title.textContent = 'Create account';
+    subtitle.textContent = 'Set up your NovaCart account in seconds.';
+    loginButton.textContent = 'Create account';
+    confirmPasswordGroup.classList.remove('hidden');
+    recoveryGroup.classList.add('hidden');
+    passwordInput.autocomplete = 'new-password';
+    passwordInput.placeholder = 'Create a password';
+    signupRow.innerHTML = 'Already have an account? <a href="#" class="link-btn" id="backToSignInFromCreate">Sign in</a>';
+    document.getElementById('backToSignInFromCreate').addEventListener('click', (event) => {
+      event.preventDefault();
+      setMode('signin');
+    });
+  } else if (mode === 'forgot') {
+    title.textContent = 'Forgot password';
+    subtitle.textContent = 'Enter your details and we will send reset instructions.';
+    loginButton.textContent = 'Send reset link';
+    confirmPasswordGroup.classList.add('hidden');
+    recoveryGroup.classList.remove('hidden');
+    passwordInput.autocomplete = 'off';
+    passwordInput.placeholder = 'Last remembered password (optional)';
+    signupRow.innerHTML = 'Remembered it? <a href="#" class="link-btn" id="backToSignInFromForgot">Sign in</a>';
+    document.getElementById('backToSignInFromForgot').addEventListener('click', (event) => {
+      event.preventDefault();
+      setMode('signin');
+    });
+  } else {
+    title.textContent = 'Sign in';
+    subtitle.textContent = 'Access your account to continue shopping.';
+    loginButton.textContent = 'Sign in securely';
+    confirmPasswordGroup.classList.add('hidden');
+    recoveryGroup.classList.add('hidden');
+    passwordInput.autocomplete = 'current-password';
+    passwordInput.placeholder = 'Enter your password';
+    signupRow.innerHTML = 'Don\'t have an account? <a href="#" class="link-btn" id="createAccountLink">Create one</a>';
+    document.getElementById('createAccountLink').addEventListener('click', (event) => {
+      event.preventDefault();
+      setMode('create');
+    });
+  }
+
+  setStatus('', '');
+  resetFormModeState();
 };
 
 const validate = () => {
@@ -35,9 +109,23 @@ const validate = () => {
     isValid = false;
   }
 
-  if (passwordInput.value.length < 8) {
+  if (authMode !== 'forgot' && passwordInput.value.length < 8) {
     passwordError.textContent = 'Password must be at least 8 characters long.';
     isValid = false;
+  }
+
+  if (authMode === 'create' && confirmPasswordInput.value !== passwordInput.value) {
+    confirmPasswordError.textContent = 'Passwords do not match.';
+    isValid = false;
+  }
+
+  if (authMode === 'forgot') {
+    const email = recoveryEmailInput.value.trim();
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!validEmail) {
+      recoveryEmailError.textContent = 'Enter a valid recovery email address.';
+      isValid = false;
+    }
   }
 
   return isValid;
@@ -46,6 +134,9 @@ const validate = () => {
 togglePasswordButton.addEventListener('click', () => {
   const showPassword = passwordInput.type === 'password';
   passwordInput.type = showPassword ? 'text' : 'password';
+  if (!confirmPasswordGroup.classList.contains('hidden')) {
+    confirmPasswordInput.type = showPassword ? 'text' : 'password';
+  }
   togglePasswordButton.textContent = showPassword ? 'Hide' : 'Show';
   togglePasswordButton.setAttribute('aria-label', showPassword ? 'Hide password' : 'Show password');
 });
@@ -96,7 +187,7 @@ loginForm.addEventListener('submit', (event) => {
   loginButton.textContent = 'Signing in...';
 
   const userSession = {
-    username: usernameInput.value.trim(),
+    username,
     rememberMe: rememberMeInput.checked,
     loginAt: new Date().toISOString(),
   };
@@ -112,6 +203,16 @@ loginForm.addEventListener('submit', (event) => {
     loginButton.classList.remove('is-loading');
     loginButton.textContent = originalButtonText;
   }, 600);
+});
+
+forgotPasswordLink.addEventListener('click', (event) => {
+  event.preventDefault();
+  setMode('forgot');
+});
+
+createAccountLink.addEventListener('click', (event) => {
+  event.preventDefault();
+  setMode('create');
 });
 
 window.addEventListener('DOMContentLoaded', () => {
