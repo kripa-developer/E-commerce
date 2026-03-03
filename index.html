@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>E-Commerce | Login</title>
+    <title>NovaCart | Landing</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -16,63 +16,50 @@
       <span class="orb orb-3"></span>
     </div>
 
-    <main class="layout">
+    <div id="siteHeader"></div>
+
+    <main class="layout landing-layout">
       <section class="brand-panel">
         <p class="badge">New Season 2026</p>
         <h1 class="animated-title">Welcome to NovaCart</h1>
-        <p class="subtitle">
-          A modern e-commerce experience with personalized recommendations, secure checkout, and lightning-fast performance.
-        </p>
+        <p class="subtitle">Discover trending products, fast checkout, and your personalized shopping feed.</p>
         <ul class="feature-list">
-          <li>AI-driven product discovery</li>
-          <li>One-tap secure payments</li>
-          <li>Real-time order tracking</li>
+          <li>Curated offers updated daily</li>
+          <li>Seamless one-page checkout</li>
+          <li>Smart order tracking</li>
         </ul>
+        <div class="hero-actions">
+          <a class="primary-btn block-btn" href="products.html">Browse Products</a>
+          <a class="link-btn" href="login.html">Already a member? Sign in</a>
+        </div>
       </section>
 
-      <section class="login-card" aria-labelledby="login-title">
-        <h2 id="login-title">Sign in</h2>
-        <p class="card-subtitle">Access your account to continue shopping.</p>
-
-        <form id="loginForm" novalidate>
-          <div class="field-group">
-            <label for="username">Username</label>
-            <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username" required minlength="3" />
-            <small class="error" id="usernameError"></small>
-          </div>
-
-          <div class="field-group">
-            <label for="password">Password</label>
-            <div class="password-wrap">
-              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8" />
-              <button type="button" id="togglePassword" aria-label="Show password">Show</button>
-            </div>
-            <small class="error" id="passwordError"></small>
-          </div>
-
-          <div class="form-tools">
-            <label class="checkbox-row" for="rememberMe">
-              <input id="rememberMe" name="rememberMe" type="checkbox" />
-              <span>Remember me</span>
-            </label>
-            <a href="#" class="link-btn">Forgot password?</a>
-          </div>
-
-          <button type="submit" class="primary-btn" id="loginButton">Sign in securely</button>
-          <p class="status" id="statusMessage" role="status" aria-live="polite"></p>
-        </form>
-
-        <div class="divider"><span>or continue with</span></div>
-        <div class="social-actions">
-          <button type="button" class="social-btn">Google</button>
-          <button type="button" class="social-btn">Apple</button>
-          <button type="button" class="social-btn">GitHub</button>
+      <section class="login-card quick-highlights">
+        <h2>Quick Highlights</h2>
+        <p class="card-subtitle">Everything you need on one platform.</p>
+        <div class="highlight-grid">
+          <article class="highlight-item">
+            <h3>Top Rated</h3>
+            <p>Explore community favorites across electronics, fashion, and home.</p>
+          </article>
+          <article class="highlight-item">
+            <h3>Fast Delivery</h3>
+            <p>Real-time shipping updates and doorstep delivery options.</p>
+          </article>
+          <article class="highlight-item">
+            <h3>Secure Payments</h3>
+            <p>Multiple payment methods protected by modern encryption.</p>
+          </article>
         </div>
-
-        <p class="signup-text">Don't have an account? <a href="#" class="link-btn">Create one</a></p>
       </section>
     </main>
 
-    <script src="app.js"></script>
+    <div id="siteFooter"></div>
+
+    <script src="components.js"></script>
+    <script>
+      NovaComponents.mountHeader('home');
+      NovaComponents.mountFooter();
+    </script>
   </body>
 </html>

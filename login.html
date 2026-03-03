@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Commerce | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true">
+      <span class="orb orb-1"></span>
+      <span class="orb orb-2"></span>
+      <span class="orb orb-3"></span>
+    </div>
+
+    <div id="siteHeader"></div>
+
+    <main class="layout">
+      <section class="brand-panel">
+        <p class="badge">Member Access</p>
+        <h1 class="animated-title">Sign in to NovaCart</h1>
+        <p class="subtitle">Continue shopping, track your orders, and access your personalized deals.</p>
+      </section>
+
+      <section class="login-card" aria-labelledby="login-title">
+        <h2 id="login-title">Sign in</h2>
+        <p class="card-subtitle">Access your account to continue shopping.</p>
+
+        <form id="loginForm" novalidate>
+          <div class="field-group">
+            <label for="username">Username</label>
+            <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username" required minlength="3" />
+            <small class="error" id="usernameError"></small>
+          </div>
+
+          <div class="field-group">
+            <label for="password">Password</label>
+            <div class="password-wrap">
+              <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required minlength="8" />
+              <button type="button" id="togglePassword" aria-label="Show password">Show</button>
+            </div>
+            <small class="error" id="passwordError"></small>
+          </div>
+
+          <div class="form-tools">
+            <label class="checkbox-row" for="rememberMe">
+              <input id="rememberMe" name="rememberMe" type="checkbox" />
+              <span>Remember me</span>
+            </label>
+            <a href="forgot-password.html" class="link-btn">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="primary-btn" id="loginButton">Sign in securely</button>
+          <p class="status" id="statusMessage" role="status" aria-live="polite"></p>
+        </form>
+
+        <p class="signup-text">Don't have an account? <a href="create-account.html" class="link-btn">Create one</a></p>
+      </section>
+    </main>
+
+    <div id="siteFooter"></div>
+
+    <script src="components.js"></script>
+    <script>
+      NovaComponents.mountHeader('login');
+      NovaComponents.mountFooter();
+    </script>
+    <script src="app.js"></script>
+  </body>
+</html>

@@ -9,6 +9,19 @@ const passwordError = document.getElementById('passwordError');
 const loginCard = document.querySelector('.login-card');
 const loginButton = document.getElementById('loginButton');
 
+
+const toSafeUsername = (value) => {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+
+  if (value && typeof value === 'object' && typeof value.value === 'string') {
+    return value.value.trim();
+  }
+
+  return '';
+};
+
 const setStatus = (message, type) => {
   statusMessage.textContent = message;
   statusMessage.className = `status ${type}`;
@@ -30,7 +43,7 @@ const validate = () => {
   clearErrors();
   let isValid = true;
 
-  if (usernameInput.value.trim().length < 3) {
+  if (toSafeUsername(usernameInput.value).length < 3) {
     usernameError.textContent = 'Username must be at least 3 characters long.';
     isValid = false;
   }
@@ -90,18 +103,30 @@ loginForm.addEventListener('submit', (event) => {
     return;
   }
 
+  const originalButtonText = loginButton.textContent;
+  loginButton.disabled = true;
+  loginButton.classList.add('is-loading');
+  loginButton.textContent = 'Signing in...';
+
+  const username = toSafeUsername(usernameInput.value);
+
   const userSession = {
-    username: usernameInput.value.trim(),
+    username,
     rememberMe: rememberMeInput.checked,
     loginAt: new Date().toISOString(),
   };
 
-  localStorage.setItem('novacart.session', JSON.stringify(userSession));
-  setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
-  triggerSubmitAnimation();
-  loginForm.reset();
-  passwordInput.type = 'password';
-  togglePasswordButton.textContent = 'Show';
+  setTimeout(() => {
+    localStorage.setItem('novacart.session', JSON.stringify(userSession));
+    setStatus(`Login successful! Welcome back, ${userSession.username}.`, 'success');
+    triggerSubmitAnimation();
+    loginForm.reset();
+    passwordInput.type = 'password';
+    togglePasswordButton.textContent = 'Show';
+    loginButton.disabled = false;
+    loginButton.classList.remove('is-loading');
+    loginButton.textContent = originalButtonText;
+  }, 600);
 });
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -111,11 +136,16 @@ window.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const { username, rememberMe } = JSON.parse(previousSession);
+  try {
+    const { username, rememberMe } = JSON.parse(previousSession);
+    const safeUsername = toSafeUsername(username);
 
-  if (rememberMe && username) {
-    usernameInput.value = username;
-    rememberMeInput.checked = true;
-    setStatus(`Welcome back, ${username}. Continue where you left off.`, 'success');
+    if (rememberMe && safeUsername) {
+      usernameInput.value = safeUsername;
+      rememberMeInput.checked = true;
+      setStatus(`Welcome back, ${safeUsername}. Continue where you left off.`, 'success');
+    }
+  } catch (error) {
+    localStorage.removeItem('novacart.session');
   }
 });

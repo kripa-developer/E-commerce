@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NovaCart | Products</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true">
+      <span class="orb orb-1"></span>
+      <span class="orb orb-2"></span>
+      <span class="orb orb-3"></span>
+    </div>
+
+    <div id="siteHeader"></div>
+
+    <main class="layout single-panel products-layout">
+      <section class="login-card">
+        <h2>Featured Products</h2>
+        <p class="card-subtitle">A sample product page component, separated from login and landing.</p>
+        <div class="product-grid">
+          <article class="product-card">
+            <h3>Nova Earbuds Pro</h3>
+            <p>Immersive sound with active noise cancellation.</p>
+            <strong>$89.00</strong>
+          </article>
+          <article class="product-card">
+            <h3>Smart Fitness Band</h3>
+            <p>Track workouts, sleep, and heart rate all day.</p>
+            <strong>$59.00</strong>
+          </article>
+          <article class="product-card">
+            <h3>EcoBottle 1L</h3>
+            <p>Reusable stainless steel bottle with thermal lock.</p>
+            <strong>$25.00</strong>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <div id="siteFooter"></div>
+
+    <script src="components.js"></script>
+    <script>
+      NovaComponents.mountHeader('products');
+      NovaComponents.mountFooter();
+    </script>
+  </body>
+</html>
