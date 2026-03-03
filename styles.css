@@ -77,6 +77,11 @@ body {
   perspective: 1200px;
 }
 
+.layout.single-panel {
+  grid-template-columns: minmax(320px, 460px);
+  justify-content: center;
+}
+
 .brand-panel,
 .login-card {
   border: 1px solid var(--card-border);
