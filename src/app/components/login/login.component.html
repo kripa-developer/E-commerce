@@ -1,7 +1,13 @@
 <section class="login-card" aria-labelledby="login-title">
-  <h2 id="login-title">{{ authMode === 'create' ? 'Create account' : 'Sign in' }}</h2>
+  <h2 id="login-title">
+    {{ authMode === 'create' ? 'Create account' : authMode === 'forgot' ? 'Forgot password' : 'Sign in' }}
+  </h2>
   <p class="card-subtitle">
-    {{ authMode === 'create' ? 'Set up your NovaCart account in seconds.' : 'Access your account to continue shopping.' }}
+    {{ authMode === 'create'
+      ? 'Set up your NovaCart account in seconds.'
+      : authMode === 'forgot'
+        ? 'Enter your username and recovery email to receive reset instructions.'
+        : 'Access your account to continue shopping.' }}
   </p>
 
   <form (ngSubmit)="onSubmit()" novalidate>
@@ -11,7 +17,20 @@
       <small class="error">{{ usernameError }}</small>
     </div>
 
-    <div class="field-group">
+    <div class="field-group" *ngIf="authMode === 'forgot'">
+      <label for="recoveryEmail">Recovery Email</label>
+      <input
+        id="recoveryEmail"
+        name="recoveryEmail"
+        type="email"
+        autocomplete="email"
+        placeholder="Enter your account email"
+        [(ngModel)]="recoveryEmail"
+      />
+      <small class="error">{{ recoveryEmailError }}</small>
+    </div>
+
+    <div class="field-group" *ngIf="authMode !== 'forgot'">
       <label for="password">Password</label>
       <div class="password-wrap">
         <input
@@ -41,14 +60,18 @@
     </div>
 
     <div class="form-tools">
-      <label class="checkbox-row" for="rememberMe">
+      <label class="checkbox-row" for="rememberMe" *ngIf="authMode !== 'forgot'">
         <input id="rememberMe" name="rememberMe" type="checkbox" [(ngModel)]="rememberMe" />
         <span>Remember me</span>
       </label>
-      <a routerLink="/forgot-password" class="link-btn">Forgot password?</a>
+      <span *ngIf="authMode === 'forgot'"></span>
+      <a href="#" class="link-btn" *ngIf="authMode === 'signin'" (click)="$event.preventDefault(); setMode('forgot')">Forgot password?</a>
+      <a href="#" class="link-btn" *ngIf="authMode === 'forgot'" (click)="$event.preventDefault(); setMode('signin')">Back to sign in</a>
     </div>
 
-    <button type="submit" class="primary-btn">{{ authMode === 'create' ? 'Create account' : 'Sign in securely' }}</button>
+    <button type="submit" class="primary-btn">
+      {{ authMode === 'create' ? 'Create account' : authMode === 'forgot' ? 'Send reset link' : 'Sign in securely' }}
+    </button>
     <p class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">{{ statusMessage }}</p>
   </form>
 

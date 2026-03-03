@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
 
-type AuthMode = 'signin' | 'create';
+type AuthMode = 'signin' | 'create' | 'forgot';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -17,12 +16,14 @@ export class LoginComponent {
   username = '';
   password = '';
   confirmPassword = '';
+  recoveryEmail = '';
   rememberMe = false;
   showPassword = false;
 
   usernameError = '';
   passwordError = '';
   confirmPasswordError = '';
+  recoveryEmailError = '';
   statusMessage = '';
   statusType: 'success' | 'error' | '' = '';
 
@@ -46,6 +47,7 @@ export class LoginComponent {
     this.authMode = mode;
     this.password = '';
     this.confirmPassword = '';
+    this.recoveryEmail = '';
     this.clearErrors();
     this.setStatus('', '');
   }
@@ -63,7 +65,7 @@ export class LoginComponent {
       isValid = false;
     }
 
-    if (this.password.length < 8) {
+    if (this.authMode !== 'forgot' && this.password.length < 8) {
       this.passwordError = 'Password must be at least 8 characters long.';
       isValid = false;
     }
@@ -73,8 +75,21 @@ export class LoginComponent {
       isValid = false;
     }
 
+    if (this.authMode === 'forgot') {
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.recoveryEmail.trim());
+      if (!validEmail) {
+        this.recoveryEmailError = 'Enter a valid recovery email address.';
+        isValid = false;
+      }
+    }
+
     if (!isValid) {
       this.setStatus('Please correct the highlighted fields.', 'error');
+      return;
+    }
+
+    if (this.authMode === 'forgot') {
+      this.setStatus(`Reset instructions sent to ${this.recoveryEmail.trim()}.`, 'success');
       return;
     }
 
@@ -99,6 +114,7 @@ export class LoginComponent {
     this.usernameError = '';
     this.passwordError = '';
     this.confirmPasswordError = '';
+    this.recoveryEmailError = '';
   }
 
   private setStatus(message: string, type: 'success' | 'error' | ''): void {
