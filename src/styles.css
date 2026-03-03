@@ -479,3 +479,22 @@ input[type='checkbox'] { accent-color: var(--accent); }
     transition-duration: 0.01ms !important;
   }
 }
+
+.brand-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(83, 120, 255, 0.35));
+}
+
+.brand-name {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #dce6ff;
+}

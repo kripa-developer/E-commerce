@@ -1,20 +1,18 @@
-# NovaCart - Phase 1 Login UI
+# NovaCart Angular App
 
-This repository contains the first step of the e-commerce front-end: a modern, interactive login experience using HTML, CSS, and JavaScript.
+This repository is now structured as a **real Angular workspace**.
 
-## What's included
-- Responsive split-layout hero + login card design.
-- Username/password form validation with inline error messaging.
-- Show/hide password toggle.
-- "Remember me" using `localStorage`.
-- Accessible form semantics and live status messaging.
-- Advanced cinematic animations: floating background orbs, shimmering heading, 3D tilt card interaction, and button ripple feedback.
+## Angular structure
+- `angular.json` – Angular CLI workspace configuration
+- `src/main.ts` – Angular bootstrap entrypoint
+- `src/app/app.component.*` – root app component
+- `src/app/components/login/login.component.*` – standalone Angular login component (`.ts`, `.html`, `.css`)
+- `src/styles.css` – global styles
 
-## Run locally (npm workflow)
+## Run locally
 ```bash
+npm install
 npm start
 ```
-Then open `http://localhost:4173`.
 
-
-share the next feature and can build it step by step (catalog, navbar, product cards, cart, checkout, etc.).
+Then open `http://localhost:4200`.
