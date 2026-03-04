@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthApiService, UserMeResponse } from '../../core/auth/auth-api.service';
+import { TokenStorageService } from '../../core/auth/token-storage.service';
 
 type AuthMode = 'signin' | 'create' | 'forgot';
 
@@ -26,21 +28,15 @@ export class LoginComponent {
   recoveryEmailError = '';
   statusMessage = '';
   statusType: 'success' | 'error' | '' = '';
+  isSubmitting = false;
 
-  constructor() {
-    const previousSession = localStorage.getItem('novacart.session');
-    if (!previousSession) return;
+  currentUser: UserMeResponse | null = null;
 
-    try {
-      const { username, rememberMe } = JSON.parse(previousSession) as { username?: string; rememberMe?: boolean };
-      if (rememberMe && username) {
-        this.username = username;
-        this.rememberMe = true;
-        this.setStatus(`Welcome back, ${username}. Continue where you left off.`, 'success');
-      }
-    } catch {
-      localStorage.removeItem('novacart.session');
-    }
+  constructor(
+    private readonly authApi: AuthApiService,
+    private readonly tokenStorage: TokenStorageService
+  ) {
+    this.bootstrapSession();
   }
 
   setMode(mode: AuthMode): void {
@@ -60,8 +56,11 @@ export class LoginComponent {
     this.clearErrors();
 
     let isValid = true;
-    if (this.username.trim().length < 3) {
-      this.usernameError = 'Username must be at least 3 characters long.';
+    const safeEmail = this.username.trim();
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail);
+
+    if (!validEmail) {
+      this.usernameError = 'Enter a valid email address.';
       isValid = false;
     }
 
@@ -76,8 +75,8 @@ export class LoginComponent {
     }
 
     if (this.authMode === 'forgot') {
-      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.recoveryEmail.trim());
-      if (!validEmail) {
+      const validRecoveryEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.recoveryEmail.trim());
+      if (!validRecoveryEmail) {
         this.recoveryEmailError = 'Enter a valid recovery email address.';
         isValid = false;
       }
@@ -93,21 +92,79 @@ export class LoginComponent {
       return;
     }
 
-    const safeUsername = this.username.trim();
-    localStorage.setItem('novacart.session', JSON.stringify({
-      username: safeUsername,
-      rememberMe: this.rememberMe,
-      loginAt: new Date().toISOString()
-    }));
+    this.isSubmitting = true;
+    const request$ = this.authMode === 'create'
+      ? this.authApi.register(safeEmail, this.password)
+      : this.authApi.login(safeEmail, this.password);
 
-    if (this.authMode === 'create') {
-      this.setStatus(`Account created! Welcome, ${safeUsername}.`, 'success');
-      this.setMode('signin');
-      this.username = safeUsername;
+    request$.subscribe({
+      next: (response) => {
+        this.tokenStorage.setTokens(response.accessToken, response.refreshToken);
+        localStorage.setItem('novacart.session', JSON.stringify({
+          username: safeEmail,
+          rememberMe: this.rememberMe,
+          loginAt: new Date().toISOString()
+        }));
+
+        const successText = this.authMode === 'create'
+          ? `Account created! Welcome, ${safeEmail}.`
+          : `Login successful! Welcome back, ${safeEmail}.`;
+
+        this.loadCurrentUser(successText);
+      },
+      error: (error) => {
+        const message = error?.error?.message ?? 'Authentication failed. Please try again.';
+        this.setStatus(message, 'error');
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  onLogout(): void {
+    const refreshToken = this.tokenStorage.refreshToken;
+    if (!refreshToken) {
+      this.clearClientSession('Logged out.');
       return;
     }
 
-    this.setStatus(`Login successful! Welcome back, ${safeUsername}.`, 'success');
+    this.authApi.logout(refreshToken).subscribe({
+      next: () => this.clearClientSession('Logged out successfully.'),
+      error: () => this.clearClientSession('Logged out locally.')
+    });
+  }
+
+  private bootstrapSession(): void {
+    const accessToken = this.tokenStorage.accessToken;
+    if (!accessToken) {
+      return;
+    }
+
+    this.loadCurrentUser('Session restored.');
+  }
+
+  private loadCurrentUser(successMessage: string): void {
+    this.authApi.me().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        this.username = user.email;
+        this.setStatus(successMessage, 'success');
+        this.isSubmitting = false;
+      },
+      error: () => {
+        this.tokenStorage.clear();
+        this.currentUser = null;
+        this.isSubmitting = false;
+      }
+    });
+  }
+
+  private clearClientSession(message: string): void {
+    this.tokenStorage.clear();
+    localStorage.removeItem('novacart.session');
+    this.currentUser = null;
+    this.password = '';
+    this.confirmPassword = '';
+    this.setStatus(message, 'success');
   }
 
   private clearErrors(): void {
