@@ -6,14 +6,16 @@
     {{ authMode === 'create'
       ? 'Set up your NovaCart account in seconds.'
       : authMode === 'forgot'
-        ? 'Enter your username and recovery email to receive reset instructions.'
+        ? 'Enter your email and recovery email to receive reset instructions.'
         : 'Access your account to continue shopping.' }}
   </p>
 
+  <p class="status success" *ngIf="currentUser">Signed in as {{ currentUser.email }} ({{ currentUser.role }})</p>
+
   <form (ngSubmit)="onSubmit()" novalidate>
     <div class="field-group">
-      <label for="username">Username</label>
-      <input id="username" name="username" type="text" autocomplete="username" placeholder="Enter your username" [(ngModel)]="username" />
+      <label for="username">Email</label>
+      <input id="username" name="username" type="email" autocomplete="username" placeholder="Enter your email" [(ngModel)]="username" />
       <small class="error">{{ usernameError }}</small>
     </div>
 
@@ -69,11 +71,15 @@
       <a href="#" class="link-btn" *ngIf="authMode === 'forgot'" (click)="$event.preventDefault(); setMode('signin')">Back to sign in</a>
     </div>
 
-    <button type="submit" class="primary-btn">
-      {{ authMode === 'create' ? 'Create account' : authMode === 'forgot' ? 'Send reset link' : 'Sign in securely' }}
+    <button type="submit" class="primary-btn" [disabled]="isSubmitting">
+      {{ isSubmitting
+        ? 'Please wait...'
+        : authMode === 'create' ? 'Create account' : authMode === 'forgot' ? 'Send reset link' : 'Sign in securely' }}
     </button>
     <p class="status" [class.success]="statusType === 'success'" [class.error]="statusType === 'error'">{{ statusMessage }}</p>
   </form>
+
+  <button type="button" class="social-btn" *ngIf="currentUser" (click)="onLogout()">Logout</button>
 
   <div class="divider"><span>or continue with</span></div>
   <div class="social-actions">
