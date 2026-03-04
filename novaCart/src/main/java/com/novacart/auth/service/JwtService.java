@@ -67,6 +67,10 @@ public class JwtService {
         return jwtProperties.accessTokenExpirationMs();
     }
 
+    public long getRefreshExpirationMs() {
+        return jwtProperties.refreshTokenExpirationMs();
+    }
+
     private SecretKey signingKey() {
         String secret = jwtProperties.secret();
         byte[] keyBytes;

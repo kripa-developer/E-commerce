@@ -2,6 +2,7 @@ package com.novacart.auth.service;
 
 import com.novacart.auth.dto.LoginRequest;
 import com.novacart.auth.dto.RegisterRequest;
+import com.novacart.auth.repository.RefreshTokenRepository;
 import com.novacart.user.domain.User;
 import com.novacart.user.domain.UserRole;
 import com.novacart.user.repository.UserRepository;
@@ -26,6 +27,9 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
@@ -43,6 +47,16 @@ class AuthServiceTest {
 
         assertEquals(409, ex.getStatusCode().value());
         assertEquals("Email already exists", ex.getReason());
+    }
+
+    @Test
+    void refreshShouldReturnUnauthorizedWhenTokenNotFound() {
+        when(refreshTokenRepository.findByToken("missing-token")).thenReturn(Optional.empty());
+
+        ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> authService.refresh("missing-token"));
+
+        assertEquals(401, ex.getStatusCode().value());
+        assertEquals("Invalid refresh token", ex.getReason());
     }
 
     @Test
