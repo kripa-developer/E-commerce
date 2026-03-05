@@ -2,14 +2,15 @@ server:
   port: 8811
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/novacart_dev
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/novacart_dev
     username: root
     password: Kripa@123
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
 
 app:
   jwt:
