@@ -17,6 +17,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderNumber(String orderNumber);
     Optional<Order> findByIdAndUser(Long id, User user);
     Page<Order> findByStatus(OrderStatus status, Pageable pageable);
+//    Page<Order> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    @Query(value = "SELECT o FROM Order o JOIN FETCH o.user ORDER BY o.createdAt DESC",
+            countQuery = "SELECT COUNT(o) FROM Order o")
     Page<Order> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status NOT IN ('CANCELLED', 'RETURNED')")

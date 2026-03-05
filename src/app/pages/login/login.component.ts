@@ -14,9 +14,12 @@ import { ToastService } from '../../core/services/toast.service';
 })
 export class LoginPageComponent {
   mode: 'signin' | 'register' = 'signin';
-  email = ''; password = ''; confirmPassword = '';
+  email = '';
+  password = '';
+  confirmPassword = '';
   loading = false;
   showPassword = false;
+  errorMsg = '';
 
   constructor(
     private auth: AuthService,
@@ -26,10 +29,24 @@ export class LoginPageComponent {
     if (this.auth.isLoggedIn()) this.router.navigate(['/']);
   }
 
+  switchMode(): void {
+    this.mode = this.mode === 'signin' ? 'register' : 'signin';
+    this.errorMsg = '';
+    this.password = '';
+    this.confirmPassword = '';
+  }
+
   submit(): void {
-    if (!this.email || !this.password) { this.toast.error('Please fill in all fields'); return; }
-    if (this.mode === 'register' && this.password !== this.confirmPassword) { this.toast.error('Passwords do not match'); return; }
-    if (this.password.length < 8) { this.toast.error('Password must be at least 8 characters'); return; }
+    this.errorMsg = '';
+    if (!this.email || !this.password) {
+      this.errorMsg = 'Please fill in all fields'; return;
+    }
+    if (this.mode === 'register' && this.password !== this.confirmPassword) {
+      this.errorMsg = 'Passwords do not match'; return;
+    }
+    if (this.password.length < 8) {
+      this.errorMsg = 'Password must be at least 8 characters'; return;
+    }
 
     this.loading = true;
     const req$ = this.mode === 'register'
@@ -37,8 +54,14 @@ export class LoginPageComponent {
       : this.auth.login(this.email, this.password);
 
     req$.subscribe({
-      next: () => { this.toast.success(this.mode === 'register' ? 'Account created!' : 'Welcome back!'); this.router.navigate(['/']); },
-      error: err => { this.toast.error(err?.error?.message || 'Authentication failed'); this.loading = false; }
+      next: () => {
+        this.toast.success(this.mode === 'register' ? 'Account created!' : 'Welcome back!');
+        this.router.navigate(['/']);
+      },
+      error: err => {
+        this.errorMsg = err?.error?.message || 'Authentication failed';
+        this.loading = false;
+      }
     });
   }
 }

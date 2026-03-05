@@ -41,6 +41,7 @@ public class AdminService {
         this.reviewRepository = reviewRepository;
     }
 
+    @Transactional(readOnly = true)
     public DashboardStats getDashboardStats() {
         long totalUsers = userRepository.count();
         long totalProducts = productRepository.count();
@@ -61,6 +62,7 @@ public class AdminService {
                 revenueToday, revenueMonth, recentOrders);
     }
 
+    @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(OrderStatus status, int page, int size) {
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Order> orders = status != null
