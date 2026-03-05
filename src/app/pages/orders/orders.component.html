@@ -1,0 +1,124 @@
+<div class="page">
+  <div class="container">
+    <h1 class="page-title">My Orders</h1>
+
+    <div class="orders-layout">
+      <!-- Order list -->
+      <div class="orders-list">
+        <div *ngIf="loading" style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>
+        <div class="empty-state" *ngIf="!loading && orders.length === 0">
+          <div class="empty-icon">📦</div>
+          <h3>No orders yet</h3>
+          <p>When you place orders, they'll show up here</p>
+          <a routerLink="/products" class="btn btn-primary">Start Shopping</a>
+        </div>
+        <div *ngFor="let order of orders" class="order-card card" [class.active]="selectedOrder?.id === order.id" (click)="selectOrder(order)">
+          <div class="order-card-header">
+            <div>
+              <div class="order-num">{{ order.orderNumber }}</div>
+              <div class="order-date muted">{{ order.createdAt | date:'mediumDate' }}</div>
+            </div>
+            <span [class]="getBadgeClass(order.status)">{{ order.status | titlecase }}</span>
+          </div>
+          <div class="order-items-preview">
+            <span *ngFor="let item of order.items.slice(0,2)" class="item-preview">
+              <img [src]="item.productImageUrl || 'assets/placeholder.svg'" [alt]="item.productName" />
+            </span>
+            <span class="more-items" *ngIf="order.items.length > 2">+{{ order.items.length - 2 }}</span>
+          </div>
+          <div class="order-card-footer">
+            <span class="order-total">₹{{ order.totalAmount | number:'1.0-0' }}</span>
+            <span class="order-count muted">{{ order.items.length }} item{{ order.items.length > 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="page-btn" (click)="setPage(page-1)" [disabled]="page===0">‹</button>
+          <button *ngFor="let p of [].constructor(totalPages); let i=index" class="page-btn" [class.active]="i===page" (click)="setPage(i)">{{ i+1 }}</button>
+          <button class="page-btn" (click)="setPage(page+1)" [disabled]="page>=totalPages-1">›</button>
+        </div>
+      </div>
+
+      <!-- Order detail -->
+      <div class="order-detail card" *ngIf="selectedOrder">
+        <div class="detail-header">
+          <div>
+            <h2 class="detail-order-num">{{ selectedOrder.orderNumber }}</h2>
+            <div class="muted">Placed {{ selectedOrder.createdAt | date:'medium' }}</div>
+          </div>
+          <span [class]="getBadgeClass(selectedOrder.status)">{{ selectedOrder.status | titlecase }}</span>
+        </div>
+
+        <!-- Progress tracker -->
+        <div class="order-progress" *ngIf="!['CANCELLED','RETURNED','RETURN_REQUESTED'].includes(selectedOrder.status)">
+          <div *ngFor="let step of getOrderSteps(selectedOrder); let last=last" class="progress-step">
+            <div class="step-dot" [class.done]="step.done" [class.active]="step.active">
+              <span *ngIf="step.done">✓</span>
+            </div>
+            <div class="step-line" *ngIf="!last" [class.done]="step.done"></div>
+            <div class="step-label" [class.active]="step.active">{{ step.label }}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Items -->
+        <h3 class="detail-section-title">Items</h3>
+        <div class="detail-items">
+          <div class="detail-item" *ngFor="let item of selectedOrder.items">
+            <img [src]="item.productImageUrl || 'assets/placeholder.svg'" [alt]="item.productName" class="di-img" />
+            <div class="di-info">
+              <div class="di-name">{{ item.productName }}</div>
+              <div class="muted di-meta">Qty: {{ item.quantity }} × ₹{{ item.unitPrice | number:'1.0-0' }}</div>
+            </div>
+            <div class="di-total">₹{{ item.lineTotal | number:'1.0-0' }}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Address + Payment -->
+        <div class="detail-grid">
+          <div>
+            <h3 class="detail-section-title">Delivery Address</h3>
+            <div class="addr-block">
+              <strong>{{ selectedOrder.shippingAddress.name }}</strong>
+              <div>{{ selectedOrder.shippingAddress.line1 }}</div>
+              <div *ngIf="selectedOrder.shippingAddress.line2">{{ selectedOrder.shippingAddress.line2 }}</div>
+              <div>{{ selectedOrder.shippingAddress.city }}, {{ selectedOrder.shippingAddress.state }} - {{ selectedOrder.shippingAddress.pincode }}</div>
+              <div>📞 {{ selectedOrder.shippingAddress.phone }}</div>
+            </div>
+          </div>
+          <div>
+            <h3 class="detail-section-title">Payment</h3>
+            <div class="addr-block">
+              <div><strong>Method:</strong> {{ selectedOrder.paymentMethod }}</div>
+              <div><span [class]="getBadgeClass(selectedOrder.paymentStatus)">{{ selectedOrder.paymentStatus }}</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Price breakdown -->
+        <div class="price-breakdown">
+          <div class="pb-row"><span>Subtotal</span><span>₹{{ selectedOrder.subtotal | number:'1.0-0' }}</span></div>
+          <div class="pb-row"><span>Shipping</span><span>{{ selectedOrder.shippingCharge === 0 ? 'FREE' : '₹' + (selectedOrder.shippingCharge | number:'1.0-0') }}</span></div>
+          <div class="pb-row pb-total"><strong>Total</strong><strong>₹{{ selectedOrder.totalAmount | number:'1.0-0' }}</strong></div>
+        </div>
+
+        <div class="detail-actions" *ngIf="canCancel(selectedOrder)">
+          <button class="btn btn-danger" [disabled]="cancellingId === selectedOrder.id" (click)="cancelOrder(selectedOrder)">
+            {{ cancellingId === selectedOrder.id ? 'Cancelling...' : 'Cancel Order' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Placeholder -->
+      <div class="empty-detail card" *ngIf="!selectedOrder && orders.length > 0">
+        <div class="empty-icon">👆</div>
+        <p>Select an order to view details</p>
+      </div>
+    </div>
+  </div>
+</div>

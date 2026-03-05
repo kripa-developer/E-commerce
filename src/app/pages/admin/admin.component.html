@@ -1,0 +1,159 @@
+<div class="page">
+  <div class="container">
+    <div class="admin-header">
+      <h1 class="page-title">Admin Dashboard</h1>
+      <div class="admin-tabs">
+        <button class="admin-tab" [class.active]="activeTab==='overview'" (click)="setTab('overview')">Overview</button>
+        <button class="admin-tab" [class.active]="activeTab==='orders'"   (click)="setTab('orders')">Orders</button>
+        <a routerLink="/admin/categories" routerLinkActive="active" class="admin-tab">Categories</a>
+        <a routerLink="/admin/products"   routerLinkActive="active" class="admin-tab">Products</a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" style="display:flex;justify-content:center;padding:80px"><div class="spinner"></div></div>
+
+    <!-- Overview -->
+    <div *ngIf="!loading && activeTab==='overview' && stats">
+      <div class="stats-grid">
+        <div class="stat-card card">
+          <div class="stat-icon user">👥</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalUsers | number }}</div>
+            <div class="stat-label">Total Users</div>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon product">📦</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalProducts | number }}</div>
+            <div class="stat-label">Total Products</div>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon order">🛒</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.totalOrders | number }}</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon active">⚡</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ stats.activeOrders | number }}</div>
+            <div class="stat-label">Active Orders</div>
+          </div>
+        </div>
+        <div class="stat-card card wide">
+          <div class="stat-icon revenue">💰</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ formatCurrency(stats.revenueToday) }}</div>
+            <div class="stat-label">Revenue Today</div>
+          </div>
+        </div>
+        <div class="stat-card card wide">
+          <div class="stat-icon revenue">📈</div>
+          <div class="stat-info">
+            <div class="stat-value">{{ formatCurrency(stats.revenueThisMonth) }}</div>
+            <div class="stat-label">Revenue This Month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent orders -->
+      <div class="section-header" style="margin-top:40px">
+        <h2 class="section-title">Recent Orders</h2>
+        <button class="btn btn-ghost btn-sm" (click)="setTab('orders')">View All</button>
+      </div>
+      <div class="table-wrap card">
+        <table class="data-table">
+          <thead>
+            <tr><th>Order #</th><th>Customer</th><th>Status</th><th>Payment</th><th>Amount</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of stats.recentOrders">
+              <td class="order-num-cell">{{ order.orderNumber }}</td>
+              <td>{{ order.userEmail }}</td>
+              <td><span [class]="getBadge(order.status)">{{ order.status }}</span></td>
+              <td><span [class]="getBadge(order.paymentStatus)">{{ order.paymentStatus }}</span></td>
+              <td><strong>{{ formatCurrency(order.totalAmount) }}</strong></td>
+              <td class="muted">{{ order.createdAt | date:'mediumDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Orders tab -->
+    <div *ngIf="activeTab==='orders'">
+      <div class="tab-toolbar">
+        <select class="input" style="width:200px" [(ngModel)]="orderStatusFilter" (change)="orderPage=0; loadOrders()">
+          <option *ngFor="let s of orderStatuses" [value]="s">{{ s || 'All Statuses' }}</option>
+        </select>
+      </div>
+      <div class="table-wrap card">
+        <table class="data-table">
+          <thead>
+            <tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of orders">
+              <td class="order-num-cell">{{ order.orderNumber }}</td>
+              <td>{{ order.shippingAddress?.name || '—' }}</td>
+              <td>{{ order.items.length }}</td>
+              <td><strong>{{ formatCurrency(order.totalAmount) }}</strong></td>
+              <td><span [class]="getBadge(order.status)">{{ order.status }}</span></td>
+              <td class="muted">{{ order.createdAt | date:'mediumDate' }}</td>
+              <td>
+                <select class="input input-sm" [value]="order.status" (change)="updateOrderStatus(order.id, $any($event.target).value)">
+                  <option *ngFor="let s of orderStatuses.slice(1)" [value]="s">{{ s }}</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Products tab -->
+    <div *ngIf="activeTab==='products'">
+      <div class="tab-toolbar">
+        <a routerLink="/admin/products/new" class="btn btn-primary btn-sm">+ Add Product</a>
+      </div>
+      <div class="table-wrap card">
+        <table class="data-table">
+          <thead>
+            <tr><th>Image</th><th>Name</th><th>Brand</th><th>Price</th><th>Stock</th><th>Status</th><th>Rating</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of products">
+              <td><img [src]="p.primaryImageUrl || 'assets/placeholder.svg'" class="product-thumb" /></td>
+              <td>
+                <a [routerLink]="['/products', p.slug]" class="product-name-link">{{ p.name }}</a>
+              </td>
+              <td class="muted">{{ p.brand }}</td>
+              <td><strong>₹{{ p.price | number:'1.0-0' }}</strong></td>
+              <td>
+                <span class="badge" [class.badge-success]="p.inStock" [class.badge-danger]="!p.inStock">
+                  {{ p.inStock ? 'In Stock' : 'Out of Stock' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge badge-accent">{{ p.soldCount || 0 }} sold</span>
+              </td>
+              <td>
+                <span *ngIf="p.reviewCount > 0">⭐ {{ p.averageRating | number:'1.1-1' }}</span>
+                <span class="muted" *ngIf="!p.reviewCount">No reviews</span>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px">
+                  <a [routerLink]="['/products', p.slug]" class="btn btn-ghost btn-sm">View</a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

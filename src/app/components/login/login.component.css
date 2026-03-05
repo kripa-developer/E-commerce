@@ -1,8 +1,0 @@
-.login-card {
-  border: 1px solid var(--card-border);
-  border-radius: 24px;
-  backdrop-filter: blur(12px);
-  background: var(--card);
-  padding: 34px;
-  box-shadow: 0 10px 25px rgba(12, 21, 44, 0.3);
-}

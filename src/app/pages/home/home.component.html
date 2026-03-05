@@ -1,0 +1,127 @@
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <span class="hero-badge badge badge-accent">New Season 2026</span>
+      <h1 class="hero-title">Discover Premium<br>Products at <em>Nova</em>Prices</h1>
+      <p class="hero-sub">AI-powered discovery, lightning checkout, real-time tracking. Shop smarter.</p>
+      <div class="hero-actions">
+        <a routerLink="/products" class="btn btn-primary btn-lg">Shop Now</a>
+        <a routerLink="/products" [queryParams]="{sortBy:'popular'}" class="btn btn-ghost btn-lg">View Deals</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><strong>50K+</strong><span>Products</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>2M+</strong><span>Happy Customers</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>Free</strong><span>Delivery ₹499+</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-float glass">
+        <svg width="64" height="64" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g1" x1="16" y1="12" x2="82" y2="84"><stop stop-color="#82A1FF"/><stop offset="1" stop-color="#46E3DA"/></linearGradient></defs>
+          <rect x="8" y="8" width="80" height="80" rx="24" fill="#0E1631"/>
+          <path d="M24 58L38 34L49 53L61 40L72 58" stroke="url(#g1)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="66" cy="33" r="5" fill="#82A1FF"/>
+        </svg>
+        <div class="hero-card-text">
+          <strong>NovaCart Premium</strong>
+          <span>Trusted by millions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories -->
+<section class="section" *ngIf="categories.length">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Shop by Category</h2>
+      <a routerLink="/products" class="btn btn-ghost btn-sm">View All →</a>
+    </div>
+    <div class="categories-grid">
+      <button *ngFor="let cat of categories" class="category-pill" (click)="browseCategory(cat)">
+        <div class="cat-icon">
+          <img *ngIf="cat.imageUrl" [src]="cat.imageUrl" [alt]="cat.name" />
+          <span *ngIf="!cat.imageUrl">🛍️</span>
+        </div>
+        <span>{{ cat.name }}</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Best Sellers -->
+<section class="section" *ngIf="bestSellers.length">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Best Sellers</h2>
+        <p class="section-sub">Most loved by our customers</p>
+      </div>
+      <a routerLink="/products" [queryParams]="{sortBy:'popular'}" class="btn btn-ghost btn-sm">See All →</a>
+    </div>
+    <div class="products-grid">
+      <app-product-card *ngFor="let p of bestSellers" [product]="p" />
+    </div>
+  </div>
+</section>
+
+<!-- Banner -->
+<section class="promo-banner">
+  <div class="container">
+    <div class="banner-inner glass">
+      <div class="banner-text">
+        <span class="badge badge-warning">🔥 Limited Time</span>
+        <h2>Top Deals — Up to 70% Off</h2>
+        <p>Best prices on electronics, fashion, home & more.</p>
+        <button class="btn btn-primary" (click)="browseDeals()">Grab Deals</button>
+      </div>
+      <div class="banner-visual">
+        <div class="deal-bubbles">
+          <div class="deal-bubble" *ngFor="let d of topDeals.slice(0,3)">
+            <span class="deal-pct">-{{ d.discountPercent | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="section" *ngIf="newArrivals.length">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">New Arrivals</h2>
+        <p class="section-sub">Just landed in our store</p>
+      </div>
+      <a routerLink="/products" [queryParams]="{sortBy:'newest'}" class="btn btn-ghost btn-sm">See All →</a>
+    </div>
+    <div class="products-grid">
+      <app-product-card *ngFor="let p of newArrivals" [product]="p" />
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features-section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-item" *ngFor="let f of features">
+        <div class="feature-icon">{{ f.icon }}</div>
+        <div>
+          <h4>{{ f.title }}</h4>
+          <p>{{ f.desc }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,90 @@
+<div class="page">
+  <div class="container products-layout">
+
+    <!-- Sidebar filters -->
+    <aside class="filters-sidebar card">
+      <div class="filters-header">
+        <h3>Filters</h3>
+        <button class="btn btn-ghost btn-sm" (click)="clearFilters()">Clear All</button>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Category</label>
+        <select class="input" [(ngModel)]="selectedCategoryId" (change)="applyFilters()">
+          <option [value]="undefined">All Categories</option>
+          <option *ngFor="let c of categories" [value]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group" *ngIf="brands.length">
+        <label class="filter-label">Brand</label>
+        <select class="input" [(ngModel)]="selectedBrand" (change)="applyFilters()">
+          <option value="">All Brands</option>
+          <option *ngFor="let b of brands" [value]="b">{{ b }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Price Range</label>
+        <div class="price-inputs">
+          <input type="number" class="input" placeholder="Min ₹" [(ngModel)]="minPrice" />
+          <span>–</span>
+          <input type="number" class="input" placeholder="Max ₹" [(ngModel)]="maxPrice" />
+        </div>
+        <button class="btn btn-outline btn-sm btn-full" style="margin-top:10px" (click)="applyFilters()">Apply</button>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Sort By</label>
+        <select class="input" [(ngModel)]="sortBy" (change)="applyFilters()">
+          <option *ngFor="let o of sortOptions" [value]="o.value">{{ o.label }}</option>
+        </select>
+      </div>
+    </aside>
+
+    <!-- Product grid -->
+    <main class="products-main">
+      <!-- Header -->
+      <div class="products-header">
+        <div class="results-info" *ngIf="!loading">
+          <span *ngIf="keyword"><strong>"{{ keyword }}"</strong> — </span>
+          <span>{{ totalElements | number }} product{{ totalElements !== 1 ? 's' : '' }} found</span>
+        </div>
+        <div class="results-info skeleton" *ngIf="loading" style="width:160px;height:20px"></div>
+      </div>
+
+      <!-- Loading skeletons -->
+      <div class="products-grid" *ngIf="loading">
+        <div *ngFor="let i of [1,2,3,4,5,6,7,8]" class="product-skeleton">
+          <div class="skeleton" style="aspect-ratio:1;border-radius:12px 12px 0 0"></div>
+          <div style="padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div class="skeleton" style="height:12px;width:50%"></div>
+            <div class="skeleton" style="height:16px;width:90%"></div>
+            <div class="skeleton" style="height:16px;width:70%"></div>
+            <div class="skeleton" style="height:36px;border-radius:10px;margin-top:6px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products -->
+      <div class="products-grid" *ngIf="!loading && products.length">
+        <app-product-card *ngFor="let p of products" [product]="p" />
+      </div>
+
+      <!-- Empty -->
+      <div class="empty-state" *ngIf="!loading && !products.length">
+        <div class="empty-icon">🔍</div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <button class="btn btn-primary" (click)="clearFilters()">Clear Filters</button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="!loading && totalPages > 1">
+        <button class="page-btn" (click)="setPage(page - 1)" [disabled]="page === 0">‹</button>
+        <button *ngFor="let p of getPages()" class="page-btn" [class.active]="p === page" (click)="setPage(p)">{{ p + 1 }}</button>
+        <button class="page-btn" (click)="setPage(page + 1)" [disabled]="page >= totalPages - 1">›</button>
+      </div>
+    </main>
+  </div>
+</div>

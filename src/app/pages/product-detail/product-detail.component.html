@@ -1,0 +1,201 @@
+<div class="page">
+  <div class="container" *ngIf="!loading && product">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <a routerLink="/">Home</a> /
+      <a routerLink="/products">Products</a> /
+      <a routerLink="/products" [queryParams]="{categoryId: product.categoryId}">{{ product.categoryName }}</a> /
+      <span>{{ product.name }}</span>
+    </nav>
+
+    <!-- Main product section -->
+    <div class="product-layout">
+
+      <!-- Images -->
+      <div class="images-section">
+        <div class="main-image">
+          <img [src]="(product.images[selectedImage]?.imageUrl) || 'assets/placeholder.svg'"
+               [alt]="product.name" class="main-img" />
+          <button class="wishlist-btn" [class.active]="inWishlist" (click)="toggleWishlist()">
+            {{ inWishlist ? '♥' : '♡' }}
+          </button>
+        </div>
+        <div class="thumbnails" *ngIf="product.images.length > 1">
+          <button *ngFor="let img of product.images; let i = index"
+                  class="thumb" [class.active]="selectedImage === i"
+                  (click)="selectedImage = i">
+            <img [src]="img.imageUrl" [alt]="img.altText" />
+          </button>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="product-info">
+        <div class="info-brand">{{ product.brand }}</div>
+        <h1 class="info-name">{{ product.name }}</h1>
+
+        <!-- Rating -->
+        <div class="info-rating" *ngIf="product.reviewCount > 0">
+          <div class="stars">
+            <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= product.averageRating">★</span>
+          </div>
+          <span>{{ product.averageRating | number:'1.1-1' }}</span>
+          <span class="muted">({{ product.reviewCount }} reviews)</span>
+          <span class="muted">· {{ product.soldCount | number }} sold</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Price -->
+        <div class="info-price">
+          <span class="price-big">₹{{ product.price | number:'1.0-0' }}</span>
+          <span class="price-mrp" *ngIf="product.mrp > product.price">₹{{ product.mrp | number:'1.0-0' }}</span>
+          <span class="badge badge-success" *ngIf="product.discountPercent > 0">{{ product.discountPercent | number:'1.0-0' }}% OFF</span>
+        </div>
+        <p class="tax-note">Inclusive of all taxes</p>
+
+        <!-- Stock -->
+        <div class="stock-info">
+          <span class="badge badge-success" *ngIf="product.inStock">● In Stock</span>
+          <span class="badge badge-danger"  *ngIf="!product.inStock">● Out of Stock</span>
+          <span class="muted" *ngIf="product.inStock && product.stockQuantity < 10">Only {{ product.stockQuantity }} left!</span>
+        </div>
+
+        <!-- Quantity -->
+        <div class="qty-row" *ngIf="product.inStock">
+          <label class="qty-label">Quantity</label>
+          <div class="qty-control">
+            <button (click)="quantity = quantity > 1 ? quantity - 1 : 1">−</button>
+            <span>{{ quantity }}</span>
+            <button (click)="quantity = quantity < product.stockQuantity ? quantity + 1 : quantity">+</button>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-btns">
+          <button class="btn btn-primary btn-lg" [disabled]="!product.inStock || addingToCart" (click)="addToCart()">
+            <span *ngIf="!addingToCart">🛒 Add to Cart</span>
+            <span *ngIf="addingToCart">Adding...</span>
+          </button>
+          <button class="btn btn-outline btn-lg" [disabled]="!product.inStock" (click)="buyNow()">Buy Now</button>
+        </div>
+
+        <!-- Delivery info -->
+        <div class="delivery-info glass">
+          <div class="delivery-row"><span>🚚</span><span>Free delivery on orders above ₹499</span></div>
+          <div class="delivery-row"><span>↩️</span><span>10-day easy returns</span></div>
+          <div class="delivery-row"><span>🔒</span><span>Secure checkout guaranteed</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-section">
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab==='description'" (click)="activeTab='description'">Description</button>
+        <button class="tab" [class.active]="activeTab==='specs'"       (click)="activeTab='specs'" *ngIf="product.attributes.length">Specifications</button>
+        <button class="tab" [class.active]="activeTab==='reviews'"     (click)="activeTab='reviews'">Reviews ({{ product.reviewCount }})</button>
+      </div>
+
+      <!-- Description -->
+      <div class="tab-content" *ngIf="activeTab==='description'">
+        <p class="description-text" *ngIf="product.description">{{ product.description }}</p>
+        <p class="muted" *ngIf="!product.description">No description available.</p>
+      </div>
+
+      <!-- Specs -->
+      <div class="tab-content" *ngIf="activeTab==='specs'">
+        <div class="specs-table">
+          <div class="spec-row" *ngFor="let attr of product.attributes">
+            <span class="spec-name">{{ attr.name }}</span>
+            <span class="spec-value">{{ attr.value }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="tab-content" *ngIf="activeTab==='reviews'">
+        <!-- Summary -->
+        <div class="review-summary" *ngIf="reviewSummary && reviewSummary.totalReviews > 0">
+          <div class="avg-rating">
+            <span class="avg-num">{{ reviewSummary.averageRating | number:'1.1-1' }}</span>
+            <div class="stars">
+              <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= reviewSummary.averageRating">★</span>
+            </div>
+            <span class="muted">{{ reviewSummary.totalReviews }} reviews</span>
+          </div>
+          <div class="rating-bars">
+            <div class="rating-bar-row" *ngFor="let star of [5,4,3,2,1]">
+              <span class="bar-label">{{ star }}★</span>
+              <div class="bar-track"><div class="bar-fill" [style.width.%]="getRatingPercent(star)"></div></div>
+              <span class="bar-count">{{ ($any(reviewSummary.ratingDistribution)[star]) ?? 0 }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Write review button -->
+        <button class="btn btn-outline" *ngIf="auth.isLoggedIn() && !showReviewForm" (click)="showReviewForm = true">Write a Review</button>
+
+        <!-- Review form -->
+        <div class="review-form card" *ngIf="showReviewForm">
+          <h3>Your Review</h3>
+          <div class="star-select">
+            <button *ngFor="let s of [1,2,3,4,5]" class="star-btn" [class.active]="s <= newReview.rating" (click)="setRating(s)">★</button>
+            <span class="muted">{{ ratingLabels[newReview.rating] }}</span>
+          </div>
+          <div class="field">
+            <label>Title</label>
+            <input type="text" class="input" placeholder="Summary of your review" [(ngModel)]="newReview.title" />
+          </div>
+          <div class="field">
+            <label>Review</label>
+            <textarea class="input" rows="4" placeholder="Tell others about your experience..." [(ngModel)]="newReview.body"></textarea>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-primary" [disabled]="submittingReview || !newReview.title" (click)="submitReview()">Submit</button>
+            <button class="btn btn-ghost" (click)="showReviewForm = false">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Review list -->
+        <div class="reviews-list">
+          <div class="review-item card" *ngFor="let r of reviews">
+            <div class="review-header">
+              <div class="reviewer-avatar">{{ r.userEmail[0].toUpperCase() }}</div>
+              <div>
+                <div class="reviewer-name">{{ r.userEmail.split('@')[0] }}</div>
+                <div class="stars">
+                  <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= r.rating">★</span>
+                </div>
+              </div>
+              <span class="badge badge-teal" *ngIf="r.verifiedPurchase">Verified</span>
+              <span class="review-date muted">{{ r.createdAt | date:'mediumDate' }}</span>
+            </div>
+            <h4 class="review-title">{{ r.title }}</h4>
+            <p class="review-body muted" *ngIf="r.body">{{ r.body }}</p>
+          </div>
+          <div class="empty-state" *ngIf="reviews.length === 0">
+            <div class="empty-icon">💬</div>
+            <h3>No reviews yet</h3>
+            <p>Be the first to review this product</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="container" *ngIf="loading">
+    <div class="product-layout">
+      <div class="skeleton" style="aspect-ratio:1;border-radius:20px"></div>
+      <div style="display:flex;flex-direction:column;gap:16px;padding-top:20px">
+        <div class="skeleton" style="height:14px;width:100px"></div>
+        <div class="skeleton" style="height:28px;width:80%"></div>
+        <div class="skeleton" style="height:20px;width:50%"></div>
+        <div class="skeleton" style="height:40px;width:60%"></div>
+        <div class="skeleton" style="height:50px;border-radius:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>

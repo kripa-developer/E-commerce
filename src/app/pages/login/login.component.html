@@ -1,0 +1,44 @@
+<div class="login-page">
+  <div class="login-bg">
+    <span class="orb orb-1"></span><span class="orb orb-2"></span><span class="orb orb-3"></span>
+  </div>
+  <div class="login-card glass slide-up">
+    <div class="login-logo">
+      <img src="assets/novacart-logo.svg" alt="NovaCart" width="40" height="40" />
+      <span>NovaCart</span>
+    </div>
+    <h1 class="login-title">{{ mode === 'signin' ? 'Welcome back' : 'Create account' }}</h1>
+    <p class="login-sub">{{ mode === 'signin' ? 'Sign in to continue shopping' : 'Join NovaCart today' }}</p>
+
+    <div class="field">
+      <label>Email</label>
+      <input type="email" class="input" placeholder="you@example.com" [(ngModel)]="email" (keyup.enter)="submit()" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="pw-wrap">
+        <input [type]="showPassword ? 'text' : 'password'" class="input" placeholder="Min 8 characters" [(ngModel)]="password" (keyup.enter)="submit()" />
+        <button type="button" class="pw-toggle" (click)="showPassword = !showPassword">{{ showPassword ? 'Hide' : 'Show' }}</button>
+      </div>
+    </div>
+    <div class="field" *ngIf="mode === 'register'">
+      <label>Confirm Password</label>
+      <input type="password" class="input" placeholder="Repeat password" [(ngModel)]="confirmPassword" (keyup.enter)="submit()" />
+    </div>
+
+    <button class="btn btn-primary btn-full btn-lg" [disabled]="loading" (click)="submit()">
+      {{ loading ? 'Please wait...' : (mode === 'signin' ? 'Sign In' : 'Create Account') }}
+    </button>
+
+    <div class="divider"><span>or</span></div>
+    <p class="switch-mode">
+      {{ mode === 'signin' ? "Don't have an account?" : "Already have an account?" }}
+      <a href="#" (click)="$event.preventDefault(); mode = mode === 'signin' ? 'register' : 'signin'">
+        {{ mode === 'signin' ? 'Sign up' : 'Sign in' }}
+      </a>
+    </p>
+    <div class="back-home">
+      <a routerLink="/">← Back to Home</a>
+    </div>
+  </div>
+</div>
