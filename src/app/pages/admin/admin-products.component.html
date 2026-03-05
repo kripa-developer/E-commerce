@@ -1,0 +1,270 @@
+<div class="pm-page">
+
+  <!-- ── Header ── -->
+  <div class="pm-header">
+    <div>
+      <h1 class="pm-title">Products</h1>
+      <p class="pm-sub">{{ totalElements | number }} total products</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreate()">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Product
+    </button>
+  </div>
+
+  <!-- ── Filters ── -->
+  <div class="pm-toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="input search-input" placeholder="Search products..." [(ngModel)]="searchKeyword" (keyup.enter)="onSearch()" />
+    </div>
+    <select class="input filter-select" [(ngModel)]="filterCategory" (change)="onSearch()">
+      <option [ngValue]="null">All Categories</option>
+      <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+    </select>
+    <button class="btn btn-ghost btn-sm" (click)="searchKeyword=''; filterCategory=null; onSearch()">Clear</button>
+  </div>
+
+  <!-- ── Table ── -->
+  <div class="pm-table-wrap">
+    <!-- Loading -->
+    <div class="loading-row" *ngIf="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Empty -->
+    <div class="empty-state" *ngIf="!loading && products.length === 0">
+      <div class="empty-icon">📦</div>
+      <h3>No products found</h3>
+      <p>Try adjusting your search or add a new product</p>
+      <button class="btn btn-primary" (click)="openCreate()">Add First Product</button>
+    </div>
+
+    <!-- Table -->
+    <table class="pm-table" *ngIf="!loading && products.length > 0">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Stock</th>
+          <th>Rating</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+          <td>
+            <div class="product-cell">
+              <img [src]="p.primaryImageUrl || 'assets/placeholder.svg'" [alt]="p.name" class="product-thumb" />
+              <div class="product-cell-info">
+                <div class="product-cell-name">{{ p.name }}</div>
+                <div class="product-cell-brand">{{ p.brand }}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="category-tag">{{ p.categoryName }}</span></td>
+          <td>
+            <div class="price-cell">
+              <span class="price-main">₹{{ p.price | number:'1.0-0' }}</span>
+              <span class="price-mrp" *ngIf="p.mrp > p.price">₹{{ p.mrp | number:'1.0-0' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="badge" [class.badge-success]="p.inStock" [class.badge-danger]="!p.inStock">
+              {{ p.inStock ? 'In Stock' : 'Out of Stock' }}
+            </span>
+          </td>
+          <td>
+            <div class="rating-cell" *ngIf="p.reviewCount > 0">
+              <span class="star-gold">★</span>
+              <span>{{ p.averageRating | number:'1.1-1' }}</span>
+              <span class="muted">({{ p.reviewCount }})</span>
+            </div>
+            <span class="muted" *ngIf="!p.reviewCount">—</span>
+          </td>
+          <td>
+            <button class="status-toggle" [class.active]="p.inStock" (click)="toggleStatus(p)">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span>{{ p.inStock ? 'Active' : 'Inactive' }}</span>
+            </button>
+          </td>
+          <td>
+            <div class="action-btns">
+              <button class="btn btn-ghost btn-sm" (click)="openEdit(p)" title="Edit">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="confirmDelete(p.id)" title="Delete">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="!loading && totalPages > 1">
+      <button class="page-btn" (click)="setPage(page-1)" [disabled]="page===0">‹</button>
+      <button *ngFor="let p of getPages()" class="page-btn" [class.active]="p===page" (click)="setPage(p)">{{ p+1 }}</button>
+      <button class="page-btn" (click)="setPage(page+1)" [disabled]="page>=totalPages-1">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     CREATE / EDIT MODAL
+══════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="modalMode" (click)="closeModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2>{{ modalMode === 'create' ? 'Add New Product' : 'Edit Product' }}</h2>
+      <button class="modal-close btn-icon" (click)="closeModal()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Section: Basic Info -->
+      <div class="form-section">
+        <div class="form-section-title">Basic Information</div>
+        <div class="form-grid-2">
+          <div class="field" style="grid-column:1/-1">
+            <label>Product Name <span class="required">*</span></label>
+            <input type="text" class="input" placeholder="e.g. Sony WH-1000XM5 Headphones" [(ngModel)]="form.name" />
+          </div>
+          <div class="field">
+            <label>Brand <span class="required">*</span></label>
+            <input type="text" class="input" placeholder="e.g. Sony" [(ngModel)]="form.brand" />
+          </div>
+          <div class="field">
+            <label>SKU</label>
+            <input type="text" class="input" placeholder="e.g. SONY-WH1000XM5" [(ngModel)]="form.sku" />
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Short Description</label>
+            <input type="text" class="input" placeholder="One-line summary shown on product cards" [(ngModel)]="form.shortDescription" />
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Full Description</label>
+            <textarea class="input" rows="4" placeholder="Detailed product description..." [(ngModel)]="form.description"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Pricing & Inventory -->
+      <div class="form-section">
+        <div class="form-section-title">Pricing & Inventory</div>
+        <div class="form-grid-3">
+          <div class="field">
+            <label>Selling Price (₹) <span class="required">*</span></label>
+            <input type="number" class="input" placeholder="0" [(ngModel)]="form.price" min="0" />
+          </div>
+          <div class="field">
+            <label>MRP (₹)</label>
+            <input type="number" class="input" placeholder="0 (= no strikethrough)" [(ngModel)]="form.mrp" min="0" />
+          </div>
+          <div class="field">
+            <label>Stock Quantity</label>
+            <input type="number" class="input" placeholder="0" [(ngModel)]="form.stockQuantity" min="0" />
+          </div>
+          <div class="field">
+            <label>Category <span class="required">*</span></label>
+            <select class="input" [(ngModel)]="form.categoryId">
+              <option [ngValue]="null" disabled>Select category</option>
+              <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Weight (grams)</label>
+            <input type="number" class="input" placeholder="e.g. 500" [(ngModel)]="form.weightGrams" min="0" />
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select class="input" [(ngModel)]="form.status">
+              <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="discount-preview" *ngIf="form.price && form.mrp && form.mrp > form.price">
+          <span class="badge badge-success">
+            {{ ((form.mrp - form.price) / form.mrp * 100) | number:'1.0-0' }}% discount will be shown
+          </span>
+        </div>
+      </div>
+
+      <!-- Section: Images -->
+      <div class="form-section">
+        <div class="form-section-title-row">
+          <div class="form-section-title">Product Images</div>
+          <button class="btn btn-ghost btn-sm" (click)="addImage()">+ Add Image</button>
+        </div>
+        <div class="image-rows">
+          <div *ngFor="let img of form.images; let i = index" class="image-row">
+            <div class="image-preview-wrap">
+              <img *ngIf="img.imageUrl" [src]="img.imageUrl" class="image-preview" [alt]="img.altText" onerror="this.style.display='none'" />
+              <div *ngIf="!img.imageUrl" class="image-preview-placeholder">🖼️</div>
+            </div>
+            <div class="image-row-fields">
+              <input type="url" class="input" placeholder="Image URL (https://...)" [(ngModel)]="img.imageUrl" />
+              <input type="text" class="input" placeholder="Alt text" [(ngModel)]="img.altText" />
+            </div>
+            <div class="image-row-actions">
+              <button class="btn btn-sm" [class.btn-primary]="img.primary" [class.btn-ghost]="!img.primary" (click)="setPrimary(i)" [title]="img.primary ? 'Primary image' : 'Set as primary'">
+                {{ img.primary ? '★ Primary' : '☆ Set Primary' }}
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="removeImage(i)" *ngIf="form.images.length > 1">✕</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Specifications -->
+      <div class="form-section">
+        <div class="form-section-title-row">
+          <div class="form-section-title">Specifications</div>
+          <button class="btn btn-ghost btn-sm" (click)="addAttribute()">+ Add Spec</button>
+        </div>
+        <div class="attr-rows" *ngIf="form.attributes.length">
+          <div *ngFor="let attr of form.attributes; let i = index" class="attr-row">
+            <input type="text" class="input" placeholder="e.g. Battery Life" [(ngModel)]="attr.name" />
+            <input type="text" class="input" placeholder="e.g. 30 hours" [(ngModel)]="attr.value" />
+            <button class="btn btn-danger btn-sm" (click)="removeAttribute(i)">✕</button>
+          </div>
+        </div>
+        <p class="muted hint" *ngIf="!form.attributes.length">No specifications added. Click "+ Add Spec" to add product specs like Battery Life, Colour, etc.</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="closeModal()">Cancel</button>
+      <button class="btn btn-primary" [disabled]="saving" (click)="save()">
+        <span *ngIf="!saving">{{ modalMode === 'create' ? 'Create Product' : 'Save Changes' }}</span>
+        <span *ngIf="saving" style="display:flex;align-items:center;gap:8px"><span class="spinner spinner-sm"></span> Saving...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     DELETE CONFIRM DIALOG
+══════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="deleteConfirmId" (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">🗑️</div>
+    <h3>Delete Product?</h3>
+    <p>This action cannot be undone. The product will be permanently removed.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" (click)="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" [disabled]="deleting" (click)="doDelete()">
+        {{ deleting ? 'Deleting...' : 'Yes, Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

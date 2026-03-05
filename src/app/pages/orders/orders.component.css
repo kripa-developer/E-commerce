@@ -1,0 +1,55 @@
+.page-title { font-size:2rem; margin-bottom:28px; }
+.orders-layout { display:grid; grid-template-columns:360px 1fr; gap:24px; align-items:start; }
+.orders-list { display:flex; flex-direction:column; gap:12px; }
+.order-card { cursor:pointer; transition:border-color 0.15s,box-shadow 0.15s; }
+.order-card.active { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+.order-card:hover:not(.active) { border-color:rgba(109,141,255,0.35); }
+.order-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; }
+.order-num { font-family:'Syne',sans-serif; font-weight:700; font-size:0.9rem; }
+.order-date { font-size:0.8rem; margin-top:2px; }
+.order-items-preview { display:flex; gap:6px; align-items:center; margin-bottom:12px; }
+.item-preview { width:44px; height:44px; border-radius:8px; overflow:hidden; border:1px solid var(--card-border); background:var(--bg-2); }
+.item-preview img { width:100%; height:100%; object-fit:cover; }
+.more-items { width:44px; height:44px; border-radius:8px; background:var(--bg-3); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; font-size:0.78rem; color:var(--muted); font-weight:600; }
+.order-card-footer { display:flex; justify-content:space-between; align-items:center; }
+.order-total { font-family:'Syne',sans-serif; font-weight:700; }
+.muted { color:var(--muted); }
+
+/* Detail */
+.order-detail { display:flex; flex-direction:column; gap:20px; position:sticky; top:calc(var(--nav-h)+20px); max-height:calc(100vh - var(--nav-h) - 60px); overflow-y:auto; }
+.detail-header { display:flex; justify-content:space-between; align-items:flex-start; }
+.detail-order-num { font-size:1.1rem; }
+
+/* Progress */
+.order-progress { display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding-bottom:4px; }
+.progress-step { display:flex; flex-direction:column; align-items:center; position:relative; flex:1; min-width:60px; }
+.step-dot { width:28px; height:28px; border-radius:50%; border:2px solid var(--card-border); background:var(--bg-2); display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:var(--muted); transition:all 0.2s; flex-shrink:0; }
+.step-dot.done   { background:var(--success); border-color:var(--success); color:#fff; }
+.step-dot.active { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 0 0 4px var(--accent-glow); }
+.step-line { position:absolute; top:13px; left:calc(50% + 14px); width:calc(100% - 28px); height:2px; background:var(--card-border); }
+.step-line.done { background:var(--success); }
+.step-label { font-size:0.68rem; color:var(--muted); text-align:center; margin-top:6px; text-transform:uppercase; letter-spacing:0.04em; }
+.step-label.active { color:var(--accent); font-weight:700; }
+
+.detail-section-title { font-size:0.9rem; font-weight:700; color:var(--muted-2); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:12px; }
+.detail-items { display:flex; flex-direction:column; gap:12px; }
+.detail-item { display:flex; gap:12px; align-items:center; }
+.di-img { width:52px; height:52px; border-radius:10px; object-fit:cover; background:var(--bg-2); border:1px solid var(--card-border); flex-shrink:0; }
+.di-info { flex:1; }
+.di-name { font-weight:600; font-size:0.9rem; }
+.di-meta { font-size:0.82rem; margin-top:3px; }
+.di-total { font-weight:700; font-family:'Syne',sans-serif; flex-shrink:0; }
+
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.addr-block { display:flex; flex-direction:column; gap:4px; font-size:0.88rem; color:var(--muted-2); }
+.addr-block strong { color:var(--text); }
+
+.price-breakdown { display:flex; flex-direction:column; gap:8px; }
+.pb-row { display:flex; justify-content:space-between; font-size:0.9rem; color:var(--muted-2); }
+.pb-total { font-size:1rem; color:var(--text); padding-top:8px; border-top:1px solid var(--card-border); }
+
+.detail-actions { display:flex; gap:10px; }
+.empty-detail { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px; color:var(--muted); text-align:center; gap:10px; }
+.empty-detail .empty-icon { font-size:2rem; opacity:0.4; }
+
+@media(max-width:900px) { .orders-layout { grid-template-columns:1fr; } .order-detail { position:static; max-height:none; } }

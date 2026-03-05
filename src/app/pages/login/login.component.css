@@ -1,0 +1,29 @@
+.login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; overflow:hidden; }
+.login-bg { position:fixed; inset:0; pointer-events:none; background:radial-gradient(circle at 20% 20%, #283f94 0%, transparent 42%), radial-gradient(circle at 80% 0%, #0dc8ce 0%, transparent 35%), var(--bg); }
+.orb { position:absolute; border-radius:50%; filter:blur(60px); opacity:0.4; }
+.orb-1 { width:400px; height:400px; left:-100px; top:0; background:radial-gradient(circle, rgba(109,141,255,0.9),transparent); animation:floatY 10s ease-in-out infinite; }
+.orb-2 { width:350px; height:350px; right:-50px; top:100px; background:radial-gradient(circle, rgba(13,200,206,0.8),transparent); animation:floatY 12s ease-in-out infinite reverse; }
+.orb-3 { width:250px; height:250px; right:30%; bottom:10%; background:radial-gradient(circle, rgba(153,126,255,0.7),transparent); }
+
+.login-card { position:relative; z-index:1; width:100%; max-width:420px; padding:40px; display:flex; flex-direction:column; gap:18px; }
+.login-logo { display:flex; align-items:center; gap:10px; font-family:'Syne',sans-serif; font-weight:800; font-size:1.2rem; }
+.login-logo img { filter:drop-shadow(0 0 8px rgba(109,141,255,0.5)); }
+.login-title { font-size:1.8rem; margin-top:4px; }
+.login-sub { color:var(--muted); margin-top:-10px; font-size:0.95rem; }
+
+.pw-wrap { position:relative; }
+.pw-wrap .input { padding-right:70px; }
+.pw-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); border:none; background:rgba(109,141,255,0.15); color:var(--accent); padding:6px 10px; border-radius:8px; cursor:pointer; font-size:0.82rem; font-weight:600; }
+
+.divider { position:relative; text-align:center; }
+.divider::before,.divider::after { content:''; position:absolute; top:50%; width:42%; border-top:1px solid var(--card-border); }
+.divider::before { left:0; } .divider::after { right:0; }
+.divider span { background:transparent; padding:0 10px; font-size:0.82rem; color:var(--muted); }
+
+.switch-mode { text-align:center; color:var(--muted); font-size:0.9rem; }
+.switch-mode a { color:var(--accent); font-weight:600; }
+.back-home { text-align:center; }
+.back-home a { color:var(--muted); font-size:0.85rem; }
+.back-home a:hover { color:var(--accent); }
+
+@keyframes floatY { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-20px); } }

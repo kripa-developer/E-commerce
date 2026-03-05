@@ -1,0 +1,129 @@
+<div class="page">
+  <div class="container">
+    <h1 class="page-title">{{ checkoutMode ? 'Checkout' : 'Your Cart' }}</h1>
+
+    <!-- Loading -->
+    <div class="loading-center" *ngIf="loading">
+      <div class="spinner"></div>
+    </div>
+
+    <!-- Empty cart -->
+    <div class="empty-state" *ngIf="!loading && (!cart || cart.items.length === 0)">
+      <div class="empty-icon">🛒</div>
+      <h3>Your cart is empty</h3>
+      <p>Add some products to get started</p>
+      <a routerLink="/products" class="btn btn-primary">Continue Shopping</a>
+    </div>
+
+    <!-- Cart content -->
+    <div class="cart-layout" *ngIf="!loading && cart && cart.items.length > 0">
+
+      <!-- Cart items / Checkout steps -->
+      <div class="cart-main">
+
+        <!-- Cart items (non-checkout mode) -->
+        <div *ngIf="!checkoutMode">
+          <div class="cart-item card" *ngFor="let item of cart.items">
+            <a [routerLink]="['/products', item.productSlug]" class="item-image">
+              <img [src]="item.productImageUrl || 'assets/placeholder.svg'" [alt]="item.productName" />
+            </a>
+            <div class="item-details">
+              <div class="item-brand">{{ item.brand }}</div>
+              <a [routerLink]="['/products', item.productSlug]" class="item-name">{{ item.productName }}</a>
+              <div class="price-group">
+                <span class="price">₹{{ item.unitPrice | number:'1.0-0' }}</span>
+                <span class="price-mrp" *ngIf="item.mrp > item.unitPrice">₹{{ item.mrp | number:'1.0-0' }}</span>
+              </div>
+              <span class="badge badge-danger" *ngIf="!item.inStock">Out of Stock</span>
+            </div>
+            <div class="item-controls">
+              <div class="qty-control">
+                <button (click)="updateQty(item.id, item.quantity - 1)" [disabled]="item.quantity <= 1 || updatingItem === item.id">−</button>
+                <span>{{ item.quantity }}</span>
+                <button (click)="updateQty(item.id, item.quantity + 1)" [disabled]="item.quantity >= item.availableStock || updatingItem === item.id">+</button>
+              </div>
+              <div class="item-total">₹{{ item.lineTotal | number:'1.0-0' }}</div>
+              <button class="btn btn-danger btn-sm" (click)="removeItem(item.id)" [disabled]="updatingItem === item.id">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Checkout: Address -->
+        <div *ngIf="checkoutMode" class="checkout-section">
+          <h2 class="section-heading">Delivery Address</h2>
+
+          <div class="address-list" *ngIf="addresses.length">
+            <label *ngFor="let addr of addresses" class="address-option" [class.selected]="selectedAddressId === addr.id">
+              <input type="radio" name="address" [value]="addr.id" [(ngModel)]="selectedAddressId" />
+              <div class="addr-body">
+                <div class="addr-header">
+                  <strong>{{ addr.name }}</strong>
+                  <span class="badge badge-accent">{{ addr.addressType }}</span>
+                  <span class="badge badge-teal" *ngIf="addr.defaultAddress">Default</span>
+                </div>
+                <div class="addr-text">{{ addr.line1 }}<span *ngIf="addr.line2">, {{ addr.line2 }}</span></div>
+                <div class="addr-text">{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</div>
+                <div class="addr-text">📞 {{ addr.phone }}</div>
+              </div>
+            </label>
+          </div>
+
+          <button class="btn btn-ghost btn-sm" (click)="showAddressForm = !showAddressForm">+ Add New Address</button>
+
+          <!-- Address form -->
+          <div class="address-form card" *ngIf="showAddressForm">
+            <div class="form-grid">
+              <div class="field"><label>Full Name</label><input class="input" [(ngModel)]="newAddress.name" /></div>
+              <div class="field"><label>Phone</label><input class="input" [(ngModel)]="newAddress.phone" /></div>
+              <div class="field" style="grid-column:1/-1"><label>Address Line 1</label><input class="input" [(ngModel)]="newAddress.line1" /></div>
+              <div class="field" style="grid-column:1/-1"><label>Address Line 2 (optional)</label><input class="input" [(ngModel)]="newAddress.line2" /></div>
+              <div class="field"><label>City</label><input class="input" [(ngModel)]="newAddress.city" /></div>
+              <div class="field"><label>State</label><input class="input" [(ngModel)]="newAddress.state" /></div>
+              <div class="field"><label>Pincode</label><input class="input" [(ngModel)]="newAddress.pincode" /></div>
+              <div class="field">
+                <label>Type</label>
+                <select class="input" [(ngModel)]="newAddress.addressType">
+                  <option value="HOME">Home</option><option value="WORK">Work</option><option value="OTHER">Other</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="saveAndSelectAddress()">Save & Use This Address</button>
+          </div>
+
+          <!-- Payment method -->
+          <h2 class="section-heading" style="margin-top:32px">Payment Method</h2>
+          <div class="payment-options">
+            <label *ngFor="let pm of paymentMethods" class="payment-option" [class.selected]="paymentMethod === pm.value">
+              <input type="radio" name="payment" [value]="pm.value" [(ngModel)]="paymentMethod" />
+              <span>{{ pm.label }}</span>
+            </label>
+          </div>
+
+          <div class="field" style="margin-top:20px">
+            <label>Order Notes (optional)</label>
+            <textarea class="input" rows="2" placeholder="Any special instructions..." [(ngModel)]="notes"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="order-summary card">
+        <h3 class="summary-title">Order Summary</h3>
+        <div class="summary-rows">
+          <div class="summary-row"><span>Subtotal ({{ cart.totalItems }} items)</span><span>₹{{ cart.subtotal | number:'1.0-0' }}</span></div>
+          <div class="summary-row"><span>Shipping</span><span [class.free]="shippingCharge === 0">{{ shippingCharge === 0 ? 'FREE' : '₹' + shippingCharge }}</span></div>
+          <div class="divider"></div>
+          <div class="summary-row total-row"><strong>Total</strong><strong>₹{{ total | number:'1.0-0' }}</strong></div>
+        </div>
+        <p class="free-ship-note" *ngIf="cart.subtotal < 499">Add ₹{{ 499 - cart.subtotal | number:'1.0-0' }} more for free shipping</p>
+
+        <button class="btn btn-primary btn-full btn-lg" *ngIf="!checkoutMode" (click)="startCheckout()">Proceed to Checkout →</button>
+        <button class="btn btn-primary btn-full btn-lg" *ngIf="checkoutMode" [disabled]="placingOrder || !selectedAddressId" (click)="placeOrder()">
+          {{ placingOrder ? 'Placing Order...' : 'Place Order ₹' + (total | number:'1.0-0') }}
+        </button>
+        <button class="btn btn-ghost btn-full" *ngIf="checkoutMode" (click)="checkoutMode = false">← Back to Cart</button>
+        <a routerLink="/products" class="btn btn-ghost btn-full" *ngIf="!checkoutMode">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+</div>
