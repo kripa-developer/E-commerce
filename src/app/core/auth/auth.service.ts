@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
 import { AuthResponse, UserMe } from '../models';
@@ -12,7 +12,7 @@ const BASE = 'http://localhost:8811/api/v1';
 export class AuthService {
   private _user = signal<UserMe | null>(null);
 
-  readonly user    = this._user.asReadonly();
+  readonly user       = this._user.asReadonly();
   readonly isLoggedIn = computed(() => this._user() !== null);
   readonly isAdmin    = computed(() => this._user()?.role === 'ADMIN');
 
@@ -24,15 +24,19 @@ export class AuthService {
     if (this.tokenStorage.accessToken) this.loadMe();
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
+  login(email: string, password: string): Observable<UserMe> {
     return this.http.post<AuthResponse>(`${BASE}/auth/login`, { email, password }).pipe(
-      tap(r => { this.tokenStorage.setTokens(r.accessToken, r.refreshToken); this.loadMe(); })
+      tap(r => this.tokenStorage.setTokens(r.accessToken, r.refreshToken)),
+      switchMap(() => this.http.get<UserMe>(`${BASE}/users/me`)),
+      tap(u => this._user.set(u))
     );
   }
 
-  register(email: string, password: string): Observable<AuthResponse> {
+  register(email: string, password: string): Observable<UserMe> {
     return this.http.post<AuthResponse>(`${BASE}/auth/register`, { email, password }).pipe(
-      tap(r => { this.tokenStorage.setTokens(r.accessToken, r.refreshToken); this.loadMe(); })
+      tap(r => this.tokenStorage.setTokens(r.accessToken, r.refreshToken)),
+      switchMap(() => this.http.get<UserMe>(`${BASE}/users/me`)),
+      tap(u => this._user.set(u))
     );
   }
 
