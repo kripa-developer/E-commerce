@@ -5,8 +5,11 @@ import {
   Category, Page, Product, ProductSummary, Cart, Wishlist,
   UserAddress, Order, Review, ReviewSummary, DashboardStats
 } from '../models';
+import { environment } from '../../../environments/environment';
 
-const BASE = 'http://localhost:8811/api/v1';
+// const BASE = 'http://localhost:8811/api/v1';
+
+const BASE = environment.apiUrl;
 
 // ── Category ──────────────────────────────────────────
 @Injectable({ providedIn: 'root' })

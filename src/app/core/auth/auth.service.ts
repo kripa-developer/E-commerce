@@ -5,8 +5,11 @@ import { tap, switchMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
 import { AuthResponse, UserMe } from '../models';
+import { environment } from '../../../environments/environment';
 
-const BASE = 'http://localhost:8811/api/v1';
+// const BASE = 'http://localhost:8811/api/v1';
+
+const BASE = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
