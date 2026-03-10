@@ -37,6 +37,7 @@ public class ReviewService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
     public Page<ReviewResponse> getProductReviews(Long productId, int page, int size, String sortBy) {
         Sort sort = "helpful".equals(sortBy)
                 ? Sort.by(Sort.Direction.DESC, "helpfulCount")
@@ -118,6 +119,7 @@ public class ReviewService {
         reviewRepository.save(review);
     }
 
+    @Transactional(readOnly = true)
     public Page<ReviewResponse> getMyReviews(String email, int page, int size) {
         User user = getUser(email);
         return reviewRepository.findByUserOrderByCreatedAtDesc(user, PageRequest.of(page, size))
