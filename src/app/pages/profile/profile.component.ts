@@ -9,9 +9,23 @@ import { ToastService } from '../../core/services/toast.service';
 import { UserMe, UserAddress, Review } from '../../core/models';
 import { environment } from '../../../environments/environment';
 
-// const BASE = 'http://localhost:8811/api/v1';
-
 const BASE = environment.apiUrl;
+
+const INDIA_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+  'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+];
+
+const COUNTRIES = [
+  'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
+  'Germany', 'France', 'Singapore', 'UAE', 'Saudi Arabia',
+  'Bangladesh', 'Pakistan', 'Sri Lanka', 'Nepal', 'Other'
+];
 
 @Component({
   selector: 'app-profile',
@@ -35,11 +49,15 @@ export class ProfileComponent implements OnInit {
   savingAddress = false;
   addressForm = this.emptyAddress();
 
+  // Dropdowns
+  countries = COUNTRIES;
+  indiaStates = INDIA_STATES;
+
   // Reviews
   reviews: Review[] = [];
   loadingReviews = false;
 
-  // Security (change password)
+  // Security
   pwForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
   showCurrentPw = false;
   showNewPw = false;
@@ -57,10 +75,17 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.auth.user();
-    // Load order count
     this.orderService.getMyOrders(0, 1).subscribe(p => this.totalOrders = p.totalElements);
-    // Load review count
     this.reviewService.getMyReviews(0, 1).subscribe(p => this.totalReviews = p.totalElements);
+  }
+
+  get isIndia(): boolean {
+    return this.addressForm.country === 'India';
+  }
+
+  onCountryChange(): void {
+    // Reset state when country changes
+    this.addressForm.state = '';
   }
 
   switchTab(tab: typeof this.activeTab): void {
@@ -189,7 +214,11 @@ export class ProfileComponent implements OnInit {
   }
 
   emptyAddress() {
-    return { name: '', phone: '', line1: '', line2: '', city: '', state: '', pincode: '', country: 'India', addressType: 'HOME', defaultAddress: false };
+    return {
+      name: '', phone: '', line1: '', line2: '',
+      city: '', state: '', pincode: '',
+      country: 'India', addressType: 'HOME', defaultAddress: false
+    };
   }
 
   getStars(rating: number): boolean[] {
