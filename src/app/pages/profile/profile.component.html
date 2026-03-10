@@ -162,19 +162,35 @@
                 <input type="text" class="input" placeholder="City" [(ngModel)]="addressForm.city" />
               </div>
               <div class="field">
-                <label>State</label>
-                <input type="text" class="input" placeholder="State" [(ngModel)]="addressForm.state" />
-              </div>
-              <div class="field">
                 <label>Pincode</label>
                 <input type="text" class="input" placeholder="560001" [(ngModel)]="addressForm.pincode" />
               </div>
+
+              <!-- Country dropdown -->
+              <div class="field">
+                <label>Country</label>
+                <select class="input" [(ngModel)]="addressForm.country" (ngModelChange)="onCountryChange()">
+                  <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+
+              <!-- State — dropdown for India, text input for others -->
+              <div class="field">
+                <label>State / Region</label>
+                <select class="input" *ngIf="isIndia" [(ngModel)]="addressForm.state">
+                  <option value="" disabled>Select state</option>
+                  <option *ngFor="let s of indiaStates" [value]="s">{{ s }}</option>
+                </select>
+                <input type="text" class="input" *ngIf="!isIndia"
+                       placeholder="State / Region" [(ngModel)]="addressForm.state" />
+              </div>
+
               <div class="field">
                 <label>Type</label>
                 <select class="input" [(ngModel)]="addressForm.addressType">
-                  <option value="HOME">Home</option>
-                  <option value="WORK">Work</option>
-                  <option value="OTHER">Other</option>
+                  <option value="HOME">🏠 Home</option>
+                  <option value="WORK">🏢 Work</option>
+                  <option value="OTHER">📍 Other</option>
                 </select>
               </div>
             </div>
@@ -214,6 +230,7 @@
               <div class="addr-body muted">
                 <div>{{ addr.line1 }}<span *ngIf="addr.line2">, {{ addr.line2 }}</span></div>
                 <div>{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</div>
+                <div>{{ addr.country }}</div>
                 <div>📞 {{ addr.phone }}</div>
               </div>
             </div>
