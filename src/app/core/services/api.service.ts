@@ -37,6 +37,14 @@ export class ProductService {
     return this.http.get<Page<ProductSummary>>(`${BASE}/products`, { params });
   }
 
+  searchAdmin(filters: {
+  categoryId?: number; keyword?: string; page?: number; size?: number;
+}): Observable<Page<ProductSummary>> {
+  let params = new HttpParams();
+  Object.entries(filters).forEach(([k, v]) => { if (v !== undefined && v !== null && v !== '') params = params.set(k, v); });
+  return this.http.get<Page<ProductSummary>>(`${BASE}/products/admin/all`, { params });
+}
+
   getBestSellers(page = 0, size = 10): Observable<Page<ProductSummary>> {
     return this.http.get<Page<ProductSummary>>(`${BASE}/products/best-sellers`, { params: { page, size } });
   }
