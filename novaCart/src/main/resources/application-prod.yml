@@ -4,6 +4,17 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   cors:
@@ -12,6 +23,10 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiry: 900000
     refresh-token-expiry: 604800000
+  mail:
+    from: ${APP_MAIL_FROM}
+  frontend:
+    url: ${APP_FRONTEND_URL}
 
 server:
   port: 8080

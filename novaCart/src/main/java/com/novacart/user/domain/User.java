@@ -36,6 +36,9 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    public void updatePassword(String newPasswordHash) {
+        this.passwordHash = newPasswordHash;
+    }
     protected User() {
     }
 
