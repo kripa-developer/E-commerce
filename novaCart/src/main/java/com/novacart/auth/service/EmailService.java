@@ -1,5 +1,7 @@
 package com.novacart.auth.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,6 +12,8 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     private final JavaMailSender mailSender;
 
@@ -25,6 +29,8 @@ public class EmailService {
 
     public void sendPasswordResetEmail(String toEmail, String token) {
         String resetLink = frontendUrl + "/reset-password?token=" + token;
+        log.info("Attempting to send password reset email to: {}", toEmail);
+        log.info("From email: {}", fromEmail);
 
         String html = """
                 <!DOCTYPE html>
@@ -80,7 +86,12 @@ public class EmailService {
             helper.setSubject("Reset your NovaCart password");
             helper.setText(html, true);
             mailSender.send(message);
+            log.info("Password reset email sent successfully to: {}", toEmail);
         } catch (MessagingException e) {
+            log.error("MessagingException sending email to {}: {}", toEmail, e.getMessage(), e);
+            throw new RuntimeException("Failed to send email", e);
+        } catch (Exception e) {
+            log.error("Unexpected error sending email to {}: {}", toEmail, e.getMessage(), e);
             throw new RuntimeException("Failed to send email", e);
         }
     }
