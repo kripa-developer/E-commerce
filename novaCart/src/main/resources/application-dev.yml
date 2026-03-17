@@ -6,11 +6,17 @@ spring:
     url: jdbc:mysql://localhost/novacart_dev
     username: root
     password: Kripa@123
-
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: novocartofficial@gmail.com
+    password:  ${MAIL_PASSWORD:change-me}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 app:
   jwt:
@@ -19,3 +25,7 @@ app:
     refresh-token-expiration-ms: 604800000
   cors:
     allowed-origins: http://localhost:4200
+  mail:
+    from: novocartofficial@gmail.com
+  frontend:
+    url: http://localhost:4200
