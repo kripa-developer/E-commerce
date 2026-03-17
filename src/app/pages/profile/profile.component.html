@@ -1,0 +1,341 @@
+<div class="page">
+  <div class="container">
+
+    <!-- ── Profile Header ── -->
+    <div class="profile-header card">
+      <div class="ph-avatar">{{ userInitial }}</div>
+      <div class="ph-info">
+        <h1 class="ph-email">{{ user?.email }}</h1>
+        <div class="ph-meta">
+          <span class="badge badge-accent">{{ user?.role | titlecase }}</span>
+          <span class="muted">{{ memberSince }}</span>
+        </div>
+      </div>
+      <div class="ph-stats">
+        <div class="ph-stat">
+          <strong>{{ totalOrders }}</strong>
+          <span>Orders</span>
+        </div>
+        <div class="ph-stat-divider"></div>
+        <div class="ph-stat">
+          <strong>{{ totalReviews }}</strong>
+          <span>Reviews</span>
+        </div>
+        <div class="ph-stat-divider"></div>
+        <div class="ph-stat">
+          <strong>{{ addresses.length }}</strong>
+          <span>Addresses</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Tabs ── -->
+    <div class="profile-layout">
+      <!-- Sidebar nav -->
+      <nav class="profile-nav card">
+        <button class="pnav-item" [class.active]="activeTab==='overview'" (click)="switchTab('overview')">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Overview
+        </button>
+        <button class="pnav-item" [class.active]="activeTab==='addresses'" (click)="switchTab('addresses')">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Addresses
+        </button>
+        <button class="pnav-item" [class.active]="activeTab==='reviews'" (click)="switchTab('reviews')">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          My Reviews
+        </button>
+        <button class="pnav-item" [class.active]="activeTab==='security'" (click)="switchTab('security')">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Security
+        </button>
+        <div class="pnav-divider"></div>
+        <a routerLink="/orders" class="pnav-item">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          My Orders
+        </a>
+        <a routerLink="/wishlist" class="pnav-item">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Wishlist
+        </a>
+      </nav>
+
+      <!-- Content panel -->
+      <div class="profile-content">
+
+        <!-- ── Overview ── -->
+        <div *ngIf="activeTab==='overview'" class="tab-panel">
+          <h2 class="panel-title">Account Overview</h2>
+
+          <div class="overview-grid">
+            <div class="overview-card card">
+              <div class="oc-icon orders-icon">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <div class="oc-info">
+                <div class="oc-value">{{ totalOrders }}</div>
+                <div class="oc-label muted">Total Orders</div>
+              </div>
+              <a routerLink="/orders" class="oc-link">View →</a>
+            </div>
+
+            <div class="overview-card card">
+              <div class="oc-icon wishlist-icon">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </div>
+              <div class="oc-info">
+                <div class="oc-value">—</div>
+                <div class="oc-label muted">Wishlist Items</div>
+              </div>
+              <a routerLink="/wishlist" class="oc-link">View →</a>
+            </div>
+
+            <div class="overview-card card">
+              <div class="oc-icon reviews-icon">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div class="oc-info">
+                <div class="oc-value">{{ totalReviews }}</div>
+                <div class="oc-label muted">Reviews Written</div>
+              </div>
+              <button class="oc-link" (click)="switchTab('reviews')">View →</button>
+            </div>
+          </div>
+
+          <!-- Account info -->
+          <div class="info-section card">
+            <h3 class="info-section-title">Account Details</h3>
+            <div class="info-rows">
+              <div class="info-row">
+                <span class="ir-label muted">Email</span>
+                <span class="ir-value">{{ user?.email }}</span>
+              </div>
+              <div class="info-row">
+                <span class="ir-label muted">Account ID</span>
+                <span class="ir-value font-mono">#{{ user?.id }}</span>
+              </div>
+              <div class="info-row">
+                <span class="ir-label muted">Role</span>
+                <span class="ir-value"><span class="badge badge-accent">{{ user?.role | titlecase }}</span></span>
+              </div>
+              <div class="info-row">
+                <span class="ir-label muted">Status</span>
+                <span class="ir-value"><span class="badge badge-success">● Active</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Addresses ── -->
+        <div *ngIf="activeTab==='addresses'" class="tab-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">Saved Addresses</h2>
+            <button class="btn btn-primary btn-sm" (click)="openAddAddress()">+ Add Address</button>
+          </div>
+
+          <div *ngIf="loadingAddresses" class="skeleton-list">
+            <div *ngFor="let i of [1,2]" class="skeleton" style="height:120px;border-radius:14px"></div>
+          </div>
+
+          <!-- Address form -->
+          <div class="address-form card" *ngIf="showAddressForm">
+            <h3>{{ editingAddress ? 'Edit Address' : 'New Address' }}</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" class="input" placeholder="John Doe" [(ngModel)]="addressForm.name" />
+              </div>
+              <div class="field">
+                <label>Phone</label>
+                <input type="tel" class="input" placeholder="9876543210" [(ngModel)]="addressForm.phone" />
+              </div>
+              <div class="field full">
+                <label>Address Line 1</label>
+                <input type="text" class="input" placeholder="House/Flat No, Street" [(ngModel)]="addressForm.line1" />
+              </div>
+              <div class="field full">
+                <label>Address Line 2 <span class="muted">(optional)</span></label>
+                <input type="text" class="input" placeholder="Landmark, Area" [(ngModel)]="addressForm.line2" />
+              </div>
+              <div class="field">
+                <label>City</label>
+                <input type="text" class="input" placeholder="City" [(ngModel)]="addressForm.city" />
+              </div>
+              <div class="field">
+                <label>Pincode</label>
+                <input type="text" class="input" placeholder="560001" [(ngModel)]="addressForm.pincode" />
+              </div>
+
+              <!-- Country dropdown -->
+              <div class="field">
+                <label>Country</label>
+                <select class="input" [(ngModel)]="addressForm.country" (ngModelChange)="onCountryChange()">
+                  <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+
+              <!-- State — dropdown for India, text input for others -->
+              <div class="field">
+                <label>State / Region</label>
+                <select class="input" *ngIf="isIndia" [(ngModel)]="addressForm.state">
+                  <option value="" disabled>Select state</option>
+                  <option *ngFor="let s of indiaStates" [value]="s">{{ s }}</option>
+                </select>
+                <input type="text" class="input" *ngIf="!isIndia"
+                       placeholder="State / Region" [(ngModel)]="addressForm.state" />
+              </div>
+
+              <div class="field">
+                <label>Type</label>
+                <select class="input" [(ngModel)]="addressForm.addressType">
+                  <option value="HOME">🏠 Home</option>
+                  <option value="WORK">🏢 Work</option>
+                  <option value="OTHER">📍 Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="field checkbox-field">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="addressForm.defaultAddress" />
+                Set as default address
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" [disabled]="savingAddress" (click)="saveAddress()">
+                <span class="btn-spinner" *ngIf="savingAddress"></span>
+                {{ savingAddress ? 'Saving...' : (editingAddress ? 'Update' : 'Save Address') }}
+              </button>
+              <button class="btn btn-ghost" (click)="showAddressForm = false">Cancel</button>
+            </div>
+          </div>
+
+          <!-- Address list -->
+          <div class="address-list">
+            <div class="address-card card" *ngFor="let addr of addresses">
+              <div class="addr-head">
+                <div class="addr-tags">
+                  <span class="addr-type">{{ addr.addressType | titlecase }}</span>
+                  <span class="badge badge-success" *ngIf="addr.defaultAddress">Default</span>
+                </div>
+                <div class="addr-actions">
+                  <button class="icon-btn" (click)="openEditAddress(addr)" title="Edit">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  </button>
+                  <button class="icon-btn danger" (click)="deleteAddress(addr)" title="Delete">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="addr-name">{{ addr.name }}</div>
+              <div class="addr-body muted">
+                <div>{{ addr.line1 }}<span *ngIf="addr.line2">, {{ addr.line2 }}</span></div>
+                <div>{{ addr.city }}, {{ addr.state }} - {{ addr.pincode }}</div>
+                <div>{{ addr.country }}</div>
+                <div>📞 {{ addr.phone }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="!loadingAddresses && addresses.length === 0 && !showAddressForm">
+            <div class="empty-icon">📍</div>
+            <h3>No addresses saved</h3>
+            <p class="muted">Add a delivery address to speed up checkout</p>
+            <button class="btn btn-primary" (click)="openAddAddress()">Add Address</button>
+          </div>
+        </div>
+
+        <!-- ── Reviews ── -->
+        <div *ngIf="activeTab==='reviews'" class="tab-panel">
+          <h2 class="panel-title">My Reviews</h2>
+
+          <div *ngIf="loadingReviews" class="skeleton-list">
+            <div *ngFor="let i of [1,2,3]" class="skeleton" style="height:100px;border-radius:14px"></div>
+          </div>
+
+          <div class="reviews-list">
+            <div class="review-card card" *ngFor="let r of reviews">
+              <div class="rv-header">
+                <div class="rv-stars">
+                  <span *ngFor="let s of getStars(r.rating)" class="star" [class.filled]="s">★</span>
+                </div>
+                <span class="badge badge-teal" *ngIf="r.verifiedPurchase">✓ Verified</span>
+                <span class="rv-date muted">{{ r.createdAt | date:'mediumDate' }}</span>
+                <button class="icon-btn danger ml-auto" (click)="deleteReview(r)" title="Delete review">
+                  <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                </button>
+              </div>
+              <div class="rv-title">{{ r.title }}</div>
+              <div class="rv-body muted" *ngIf="r.body">{{ r.body }}</div>
+              <a [routerLink]="['/products']" class="rv-product-link muted">View product →</a>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="!loadingReviews && reviews.length === 0">
+            <div class="empty-icon">⭐</div>
+            <h3>No reviews yet</h3>
+            <p class="muted">Share your experience with products you've bought</p>
+            <a routerLink="/orders" class="btn btn-primary">View Orders</a>
+          </div>
+        </div>
+
+        <!-- ── Security ── -->
+        <div *ngIf="activeTab==='security'" class="tab-panel">
+          <h2 class="panel-title">Security</h2>
+
+          <div class="security-card card">
+            <h3 class="sc-title">Change Password</h3>
+            <p class="muted sc-desc">Make sure your new password is at least 8 characters long.</p>
+
+            <div class="error-banner" *ngIf="pwError">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {{ pwError }}
+            </div>
+            <div class="success-banner" *ngIf="pwSuccess">
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              Password changed successfully!
+            </div>
+
+            <div class="fields">
+              <div class="field">
+                <label>Current Password</label>
+                <div class="input-wrap">
+                  <input [type]="showCurrentPw ? 'text' : 'password'" class="input" placeholder="Your current password" [(ngModel)]="pwForm.currentPassword" />
+                  <button type="button" class="pw-toggle" (click)="showCurrentPw = !showCurrentPw">{{ showCurrentPw ? 'Hide' : 'Show' }}</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>New Password</label>
+                <div class="input-wrap">
+                  <input [type]="showNewPw ? 'text' : 'password'" class="input" placeholder="Min 8 characters" [(ngModel)]="pwForm.newPassword" />
+                  <button type="button" class="pw-toggle" (click)="showNewPw = !showNewPw">{{ showNewPw ? 'Hide' : 'Show' }}</button>
+                </div>
+              </div>
+              <div class="field">
+                <label>Confirm New Password</label>
+                <input type="password" class="input" placeholder="Repeat new password" [(ngModel)]="pwForm.confirmPassword" (keyup.enter)="changePassword()" />
+              </div>
+            </div>
+
+            <button class="btn btn-primary" [disabled]="savingPw" (click)="changePassword()">
+              <span class="btn-spinner" *ngIf="savingPw"></span>
+              {{ savingPw ? 'Saving...' : 'Update Password' }}
+            </button>
+          </div>
+
+          <div class="danger-zone card">
+            <h3 class="dz-title">Account</h3>
+            <div class="dz-row">
+              <div>
+                <div class="dz-label">Sign out of all devices</div>
+                <div class="muted dz-desc">This will invalidate all your active sessions</div>
+              </div>
+              <button class="btn btn-danger btn-sm" (click)="auth.logout()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

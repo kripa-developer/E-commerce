@@ -58,4 +58,25 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT DISTINCT p.brand FROM Product p WHERE p.status = 'ACTIVE' AND p.category.id = :categoryId ORDER BY p.brand ASC")
     java.util.List<String> findBrandsByCategoryId(@Param("categoryId") Long categoryId);
+
+    @Query("""
+    SELECT p FROM Product p
+    WHERE (:categoryId IS NULL OR p.category.id = :categoryId)
+    AND (:brand IS NULL OR LOWER(p.brand) = LOWER(:brand))
+    AND (:minPrice IS NULL OR p.price >= :minPrice)
+    AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+    AND (:keyword IS NULL OR (
+            LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :keyword, '%'))
+         OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    ))
+    """)
+    Page<Product> searchAllProducts(
+            @Param("categoryId") Long categoryId,
+            @Param("brand") String brand,
+            @Param("minPrice") BigDecimal minPrice,
+            @Param("maxPrice") BigDecimal maxPrice,
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 }

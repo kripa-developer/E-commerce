@@ -2,6 +2,7 @@ import { HttpBackend, HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { TokenStorageService } from './token-storage.service';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenStorage = inject(TokenStorageService);
@@ -18,7 +19,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
       return rawHttp.post<{ accessToken: string; refreshToken: string }>(
-        'http://localhost:8811/api/v1/auth/refresh', { refreshToken }
+        `${environment.apiUrl}/auth/refresh`, { refreshToken }
       ).pipe(
         switchMap(r => {
           tokenStorage.setTokens(r.accessToken, r.refreshToken);

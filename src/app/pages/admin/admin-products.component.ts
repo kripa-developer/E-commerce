@@ -67,7 +67,7 @@ export class AdminProductsComponent implements OnInit {
 
   loadProducts(): void {
     this.loading = true;
-    this.productService.search({
+    this.productService.searchAdmin({
       keyword: this.searchKeyword || undefined,
       categoryId: this.filterCategory ?? undefined,
       page: this.page,

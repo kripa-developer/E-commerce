@@ -4,11 +4,20 @@ spring:
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    
-  jpa:
-    hibernate:
-      ddl-auto: update 
-    
+  mail:
+    host: smtp.gmail.com
+    port: 465
+    username: ${SPRING_MAIL_USERNAME}
+    password: ${SPRING_MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 app:
   cors:
@@ -17,6 +26,10 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiry: 900000
     refresh-token-expiry: 604800000
+  mail:
+    from: ${APP_MAIL_FROM}
+  frontend:
+    url: ${APP_FRONTEND_URL}
 
 server:
   port: 8080

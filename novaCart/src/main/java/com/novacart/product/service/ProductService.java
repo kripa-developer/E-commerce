@@ -219,4 +219,12 @@ public class ProductService {
             default -> Sort.by(Sort.Direction.DESC, "soldCount");
         };
     }
+    @Transactional(readOnly = true)
+    public Page<ProductSummary> searchAllProducts(Long categoryId, String brand, BigDecimal minPrice,
+                                                  BigDecimal maxPrice, String keyword, int page, int size, String sortBy) {
+        Sort sort = resolveSort(sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return productRepository.searchAllProducts(categoryId, brand, minPrice, maxPrice, keyword, pageable)
+                .map(ProductSummary::from);
+    }
 }

@@ -8,6 +8,7 @@ import { Category } from '../../core/models';
 
 interface CategoryForm {
   name: string;
+  slug: string;
   description: string;
   imageUrl: string;
   parentId: number | null;
@@ -25,7 +26,7 @@ interface CategoryForm {
 export class AdminCategoriesComponent implements OnInit {
 
   categories: Category[] = [];
-  flatCategories: Category[] = [];   // for parent dropdown (no children)
+  flatCategories: Category[] = [];
   loading = true;
 
   modalMode: 'create' | 'edit' | null = null;
@@ -45,19 +46,28 @@ export class AdminCategoriesComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    // load tree for display
     this.categoryService.getTree().subscribe({
-      next: tree => {
-        this.categories = tree;
-        this.loading = false;
-      },
+      next: tree => { this.categories = tree; this.loading = false; },
       error: () => this.loading = false
     });
-    // load flat list for parent dropdown
     this.categoryService.getAll().subscribe(all => this.flatCategories = all);
   }
 
-  // ── Modal ────────────────────────────────────────────
+  // Auto-generate slug from name
+  onNameChange(): void {
+    if (this.modalMode === 'create') {
+      this.form.slug = this.toSlug(this.form.name);
+    }
+  }
+
+  toSlug(name: string): string {
+    return name.toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
+
   openCreate(parentId: number | null = null): void {
     this.form = this.emptyForm();
     this.form.parentId = parentId;
@@ -68,6 +78,7 @@ export class AdminCategoriesComponent implements OnInit {
   openEdit(cat: Category): void {
     this.form = {
       name:         cat.name,
+      slug:         (cat as any).slug || this.toSlug(cat.name),
       description:  cat.description || '',
       imageUrl:     cat.imageUrl || '',
       parentId:     cat.parentId,
@@ -82,10 +93,14 @@ export class AdminCategoriesComponent implements OnInit {
 
   save(): void {
     if (!this.form.name.trim()) { this.toast.error('Category name is required'); return; }
+    if (!this.form.slug.trim()) { this.form.slug = this.toSlug(this.form.name); }
+
     this.saving = true;
+    const payload = { ...this.form };
+
     const req$ = this.modalMode === 'edit' && this.editingId
-      ? this.categoryService.update(this.editingId, this.form)
-      : this.categoryService.create(this.form);
+      ? this.categoryService.update(this.editingId, payload)
+      : this.categoryService.create(payload);
 
     req$.subscribe({
       next: () => {
@@ -98,7 +113,6 @@ export class AdminCategoriesComponent implements OnInit {
     });
   }
 
-  // ── Delete ───────────────────────────────────────────
   confirmDelete(id: number): void { this.deleteConfirmId = id; }
   cancelDelete(): void { this.deleteConfirmId = null; }
 
@@ -116,7 +130,6 @@ export class AdminCategoriesComponent implements OnInit {
     });
   }
 
-  // ── Helpers ──────────────────────────────────────────
   totalCount(): number {
     return this.categories.reduce((sum, c) => sum + 1 + (c.children?.length ?? 0), 0);
   }
@@ -127,6 +140,6 @@ export class AdminCategoriesComponent implements OnInit {
   }
 
   private emptyForm(): CategoryForm {
-    return { name: '', description: '', imageUrl: '', parentId: null, displayOrder: 0, active: true };
+    return { name: '', slug: '', description: '', imageUrl: '', parentId: null, displayOrder: 0, active: true };
   }
 }

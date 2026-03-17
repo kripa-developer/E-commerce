@@ -1,0 +1,95 @@
+<div class="page">
+  <div class="container">
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">My Wishlist</h1>
+        <p class="page-sub muted" *ngIf="!loading">{{ items.length }} item{{ items.length !== 1 ? 's' : '' }}</p>
+      </div>
+      <button class="btn btn-outline"
+              *ngIf="items.length > 0"
+              (click)="moveAllToCart()">
+        🛒 Add All to Cart
+      </button>
+    </div>
+
+    <!-- Loading skeletons -->
+    <div class="wishlist-grid" *ngIf="loading">
+      <div *ngFor="let i of [1,2,3,4]" class="skeleton wish-skeleton"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="!loading && items.length === 0">
+      <div class="empty-icon">🤍</div>
+      <h2>Your wishlist is empty</h2>
+      <p class="muted">Save products you love and find them here</p>
+      <a routerLink="/products" class="btn btn-primary">Browse Products</a>
+    </div>
+
+    <!-- Wishlist grid -->
+    <div class="wishlist-grid" *ngIf="!loading && items.length > 0">
+      <div class="wish-card card" *ngFor="let item of items">
+
+        <!-- Product image -->
+        <a [routerLink]="['/products', item.product.slug]" class="wish-img-wrap">
+          <img [src]="item.product.primaryImageUrl || 'assets/placeholder.svg'"
+               [alt]="item.product.name"
+               class="wish-img" />
+          <span class="out-of-stock-overlay" *ngIf="!item.product.inStock">Out of Stock</span>
+          <span class="discount-chip" *ngIf="item.product.discountPercent > 0">
+            {{ item.product.discountPercent | number:'1.0-0' }}% OFF
+          </span>
+        </a>
+
+        <!-- Remove button -->
+        <button class="remove-btn"
+                [disabled]="removingId === item.product.id"
+                (click)="removeFromWishlist(item.product.id)"
+                title="Remove from wishlist">
+          <svg *ngIf="removingId !== item.product.id" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+          <span *ngIf="removingId === item.product.id" class="btn-spinner"></span>
+        </button>
+
+        <!-- Info -->
+        <div class="wish-info">
+          <div class="wish-brand muted">{{ item.product.brand }}</div>
+          <a [routerLink]="['/products', item.product.slug]" class="wish-name">{{ item.product.name }}</a>
+
+          <!-- Rating -->
+          <div class="wish-rating" *ngIf="item.product.reviewCount > 0">
+            <span class="stars">
+              <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= item.product.averageRating">★</span>
+            </span>
+            <span class="muted rating-count">({{ item.product.reviewCount }})</span>
+          </div>
+
+          <!-- Price -->
+          <div class="wish-price">
+            <span class="price-now">₹{{ item.product.price | number:'1.0-0' }}</span>
+            <span class="price-mrp muted" *ngIf="item.product.mrp > item.product.price">
+              ₹{{ item.product.mrp | number:'1.0-0' }}
+            </span>
+          </div>
+
+          <!-- Added date -->
+          <div class="wish-added muted">Added {{ item.addedAt | date:'mediumDate' }}</div>
+
+          <!-- Add to cart -->
+          <button class="btn btn-primary add-btn"
+                  [disabled]="!item.product.inStock || addingToCartId === item.product.id"
+                  (click)="addToCart(item)">
+            <span *ngIf="addingToCartId === item.product.id" class="btn-spinner"></span>
+            <svg *ngIf="addingToCartId !== item.product.id" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            {{ item.product.inStock ? (addingToCartId === item.product.id ? 'Adding...' : 'Add to Cart') : 'Out of Stock' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
