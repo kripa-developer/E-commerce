@@ -21,9 +21,8 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: |
-          cd novaCart
-          mvn clean install -DskipTests
+        working-directory: novacart-backend
+        run: mvn clean install -DskipTests
 
   frontend:
     name: Angular Build
@@ -37,7 +36,9 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
+        working-directory: novacart-frontend
         run: npm install
 
       - name: Build Angular app
+        working-directory: novacart-frontend
         run: npm run build
